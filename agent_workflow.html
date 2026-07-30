@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ Đồ Luồng Hoàn Chỉnh (Full Workflow) - Discord AI Notice Agent</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mermaid.js for Rendering Interactive Flowchart -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                darkMode: true,
+                background: '#16181d',
+                primaryColor: '#5865f2',
+                secondaryColor: '#00f2fe',
+                tertiaryColor: '#2b2d31',
+                mainBkg: '#16181d',
+                nodeBorder: '#5865f2',
+                clusterBkg: '#0b0c0e',
+                lineColor: '#00f2fe',
+                fontFamily: 'Plus Jakarta Sans, sans-serif'
+            }
+        });
+    </script>
+
+    <style>
+        :root {
+            --bg-body: #0b0c0e;
+            --bg-card: rgba(22, 24, 29, 0.85);
+            --bg-card-hover: rgba(30, 34, 42, 0.95);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-highlight: rgba(88, 101, 242, 0.4);
+            
+            --blurple: #5865f2;
+            --blurple-glow: rgba(88, 101, 242, 0.35);
+            --cyan-accent: #00f2fe;
+            --green-success: #57f287;
+            --yellow-warning: #fee75c;
+            --red-danger: #ed4245;
+            --purple-agent: #9b51e0;
+            
+            --text-title: #ffffff;
+            --text-main: #cecfd2;
+            --text-sub: #8a8e96;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(88, 101, 242, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(0, 242, 254, 0.05) 0%, transparent 40%);
+        }
+
+        /* Header */
+        header.workflow-header {
+            background: rgba(11, 12, 14, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 18px 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--blurple), var(--cyan-accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            box-shadow: 0 0 16px var(--blurple-glow);
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-title);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-text p {
+            font-size: 0.82rem;
+            color: var(--text-sub);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action:hover {
+            border-color: var(--blurple);
+            color: var(--text-title);
+            background: rgba(88, 101, 242, 0.15);
+        }
+
+        .btn-action.primary {
+            background: var(--blurple);
+            color: white;
+            border-color: var(--blurple);
+            box-shadow: 0 0 16px var(--blurple-glow);
+        }
+
+        .btn-action.primary:hover {
+            background: #4752c4;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        /* Section Title Box */
+        .section-intro {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+        }
+
+        .intro-text h2 {
+            font-size: 1.3rem;
+            color: var(--text-title);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .intro-text p {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-top: 6px;
+            max-width: 900px;
+            line-height: 1.5;
+        }
+
+        /* Live Simulation Bar */
+        .simulation-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--green-success);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green-success);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--green-success);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.3; transform: scale(0.8); }
+        }
+
+        /* -------------------------------------------------------------
+           MAIN WORKFLOW GRAPH CANVAS & PIPELINE STEPS
+        ------------------------------------------------------------- */
+        .workflow-canvas {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        /* Connecting Flow Arrows Background */
+        .flow-stage {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .flow-stage:hover {
+            border-color: var(--border-highlight);
+            background: var(--bg-card-hover);
+        }
+
+        .stage-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 14px;
+        }
+
+        .stage-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stage-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(88, 101, 242, 0.15);
+            color: var(--blurple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            border: 1px solid rgba(88, 101, 242, 0.3);
+        }
+
+        .stage-title h3 {
+            font-size: 1.1rem;
+            color: var(--text-title);
+            font-weight: 700;
+        }
+
+        .stage-tag {
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-sub);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Node Cards Layout inside Stages */
+        .nodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .node-card {
+            background: rgba(11, 12, 14, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .node-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--blurple);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 12px var(--blurple-glow);
+        }
+
+        .node-card.active-step {
+            border-color: var(--cyan-accent);
+            box-shadow: 0 0 16px rgba(0, 242, 254, 0.3);
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .node-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--cyan-accent);
+        }
+
+        .node-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: var(--text-title);
+        }
+
+        .node-desc {
+            font-size: 0.83rem;
+            color: var(--text-sub);
+            line-height: 1.45;
+        }
+
+        .node-meta {
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .meta-tag {
+            color: var(--blurple);
+            background: rgba(88, 101, 242, 0.12);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .meta-action {
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Connector Lines between Stages */
+        .stage-connector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 24px;
+            color: var(--blurple);
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .stage-connector::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--border-highlight), transparent);
+            z-index: 1;
+        }
+
+        .connector-badge {
+            position: relative;
+            z-index: 2;
+            background: var(--bg-body);
+            border: 1px solid var(--border-highlight);
+            padding: 2px 14px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--cyan-accent);
+        }
+
+        /* -------------------------------------------------------------
+           3 CORE FEATURE ENGINE FLOWS (DEEP DIVE VISUALS)
+        ------------------------------------------------------------- */
+        .flows-three-column {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .flows-three-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .feature-flow-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-flow-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+        }
+
+        .flow-summary-card::before { background: linear-gradient(90deg, var(--blurple), #8a2be2); }
+        .flow-qa-card::before { background: linear-gradient(90deg, var(--green-success), var(--cyan-accent)); }
+        .flow-schedule-card::before { background: linear-gradient(90deg, var(--yellow-warning), var(--red-danger)); }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feature-header i {
+            font-size: 1.4rem;
+        }
+
+        .feature-header h4 {
+            font-size: 1.05rem;
+            color: var(--text-title);
+            font-weight: 700;
+        }
+
+        .feature-step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .mini-step {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.84rem;
+        }
+
+        .step-index {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-title);
+            font-weight: 700;
+            font-size: 0.72rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .mini-step-content strong {
+            color: var(--text-title);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .mini-step-content p {
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        /* -------------------------------------------------------------
+           CHANNEL TAGGING MATRIX TABLE
+        ------------------------------------------------------------- */
+        .matrix-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 24px;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            font-size: 0.88rem;
+        }
+
+        .matrix-table th {
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-title);
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .matrix-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .matrix-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .channel-badge {
+            font-family: var(--font-code);
+            background: rgba(88, 101, 242, 0.15);
+            color: var(--blurple);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(88, 101, 242, 0.3);
+        }
+
+        /* Code & Modal Inspector */
+        .inspector-panel {
+            background: #0d0e11;
+            border: 1px solid var(--border-highlight);
+            border-radius: 16px;
+            padding: 20px;
+            font-family: var(--font-code);
+            font-size: 0.82rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .inspector-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--cyan-accent);
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 14px;
+            color: #d4d4d4;
+            overflow-x: auto;
+            line-height: 1.5;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .code-keyword { color: #569cd6; }
+        .code-string { color: #ce9178; }
+        .code-number { color: #b5cea8; }
+        .code-key { color: #9cdcfe; }
+
+        /* Animation Data Packet */
+        .data-packet {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--cyan-accent);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--cyan-accent);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="workflow-header">
+        <div class="logo-box">
+            <div class="logo-icon">
+                <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <div class="logo-text">
+                <h1>Discord Notice Agent — Architectural Workflow Specification</h1>
+                <p>Sơ đồ luồng toàn diện: Ingestion → Filtering → Multi-Agent Processing → Dispatching</p>
+            </div>
+        </div>
+
+        <div class="header-controls">
+            <button class="btn-action" onclick="window.location.href='index.html'">
+                <i class="fa-solid fa-desktop"></i> Chuyển sang Discord UI Demo
+            </button>
+            <button class="btn-action primary" onclick="runWorkflowAnimation()">
+                <i class="fa-solid fa-play"></i> Mô Phỏng Luồng Dữ Liệu Realtime
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- Section Intro -->
+        <div class="section-intro">
+            <div class="intro-text">
+                <h2><i class="fa-solid fa-diagram-project" style="color: var(--blurple);"></i> Kiến Trúc Luồng Hoàn Chỉnh (Full Agent Pipeline Workflow)</h2>
+                <p>Sơ đồ kỹ thuật thể hiện chi tiết cách Agent tiếp nhận tin nhắn từ các kênh được gán nhãn, lọc nhiễu bằng NLP, đưa qua 3 luồng xử lý AI độc lập (Tóm tắt ngày, Hỏi đáp RAG, Nhắc lịch tự động) và phân phối kết quả về Discord.</p>
+            </div>
+
+            <div class="simulation-bar">
+                <div class="status-pill">
+                    <div class="pulse-dot"></div>
+                    PIPELINE ACTIVE • READY
+                </div>
+            </div>
+        </div>
+
+        <!-- -------------------------------------------------------------
+             NEW VISUAL FLOWCHART DIAGRAM SECTION (MERMAID + VISUAL NODE GRAPH)
+        ------------------------------------------------------------- -->
+        <div class="matrix-card" style="border-color: var(--border-highlight);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                <div>
+                    <h3 style="color: var(--text-title); font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-sitemap" style="color: var(--cyan-accent);"></i> Sơ Đồ Luồng Xử Lý Trực Quan (Visual Flowchart)
+                    </h3>
+                    <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 4px;">
+                        Sơ đồ thuật toán thể hiện luồng rẽ nhánh điều kiện từ Kênh đầu vào → Bộ lọc nhiễu → 3 Luồng AI Chuyên biệt → Kênh đầu ra Discord.
+                    </p>
+                </div>
+                <span class="stage-tag" style="background: rgba(0, 242, 254, 0.1); color: var(--cyan-accent); border: 1px solid rgba(0, 242, 254, 0.3);">
+                    <i class="fa-solid fa-route"></i> END-TO-END FLOW
+                </span>
+            </div>
+
+            <!-- Mermaid Interactive Flowchart Container -->
+            <div style="background: #16181d; padding: 24px; border-radius: 14px; border: 1px solid var(--border-color); overflow-x: auto; text-align: center;">
+                <pre class="mermaid">
+graph TD
+    subgraph INGESTION["1. THU THẬP & LỌC KÊNH (Channel Listener)"]
+        A[⚡ Tin nhắn mới từ Discord] --> B{Kênh thuộc Danh sách Gán nhãn?}
+        B -- ❌ Không --> C[Bỏ qua - Drop Message]
+        B -- ✅ Có: #thông-báo-chung, #thông-báo, #thông-báo-nhóm, #lớp-hoc-* --> D{Lọc Nhiễu NLP: Tin nhắn chào hỏi/Spam?}
+        D -- ❌ Có --> E[Bỏ qua - Drop Noise]
+        D -- ✅ Không --> F[Tạo Payload Thông Báo Chuẩn Hóa]
+    end
+
+    subgraph CLASSIFICATION["2. PHÂN LOẠI & ĐÁNH GIÁ ƯU TIÊN"]
+        F --> G[NLP Intent Classifier & Urgency Scorer]
+        G --> H[Gán Mức Ưu Tiên: High / Medium / Normal]
+        G --> I[Tạo Vector Embedding -> Lưu vào Vector DB]
+    end
+
+    subgraph ENGINES["3. 3 LUỒNG XỬ LÝ CHUYÊN BIỆT (Multi-Agent Engines)"]
+        H --> J[📰 LUỒNG 1: Tóm Tắt Ngày]
+        I --> K[💬 LUỒNG 2: Hỏi Đáp RAG]
+        H --> L[⏰ LUỒNG 3: Nhắc Lịch Tự Động]
+
+        J --> J1[Gom tin nhắn 24h theo nhóm] --> J2[LLM Summarize Prompt] --> J3[Tạo Digest Embed Thẻ Đỏ/Vàng/Xanh]
+        K --> K1[Nhận lệnh /ask-notice] --> K2[Vector Search Top-3 Matches] --> K3[LLM Sinh câu trả lời + Link Bài Gốc]
+        L --> L1[Temporal NER: Rút trích Ngày/Giờ/Deadline] --> L2[Lưu Scheduler Queue] --> L3[Phát Notification Alert T-24h & T-1h]
+    end
+
+    subgraph OUTPUT["4. XUẤT KẾT QUẢ VỀ DISCORD"]
+        J3 --> M[Đăng Embed vào #tóm-tắt-hàng-ngày]
+        K3 --> N[Trả lời Slash Command vào #hỏi-đáp-thông-báo]
+        L3 --> O[Phát Ping Alert vào #nhắc-lịch-tự-động + Nút Sync Google Calendar]
+    end
+
+    style A fill:#1e1f22,stroke:#00f2fe,color:#fff
+    style B fill:#2b2d31,stroke:#fee75c,color:#fff
+    style D fill:#2b2d31,stroke:#fee75c,color:#fff
+    style F fill:#1e1f22,stroke:#00f2fe,color:#fff
+    style G fill:#5865f2,stroke:#00f2fe,color:#fff
+    style J fill:#5865f2,stroke:#fff,color:#fff
+    style K fill:#57f287,stroke:#fff,color:#111
+    style L fill:#fee75c,stroke:#fff,color:#111
+    style M fill:#2b2d31,stroke:#5865f2,color:#fff
+    style N fill:#2b2d31,stroke:#57f287,color:#fff
+    style O fill:#2b2d31,stroke:#fee75c,color:#fff
+                </pre>
+            </div>
+        </div>
+
+        <!-- -------------------------------------------------------------
+             MAIN STAGE PIPELINE (STAGES 1 TO 4)
+        ------------------------------------------------------------- -->
+        <div class="workflow-canvas">
+
+            <!-- STAGE 1: INGESTION -->
+            <div class="flow-stage" id="stage-1">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <div class="stage-badge">1</div>
+                        <h3>Giai đoạn 1: Tiếp Nhận Tin Nhắn & Phân Loại Kênh (Data Ingestion & Filtering)</h3>
+                    </div>
+                    <span class="stage-tag"><i class="fa-solid fa-satellite-dish"></i> Real-time Webhook / Gateway Listener</span>
+                </div>
+
+                <div class="nodes-grid">
+                    <div class="node-card" onclick="inspectNode('node-discord-listener')">
+                        <div class="node-header">
+                            <div class="node-icon"><i class="fa-brands fa-discord"></i></div>
+                            <span class="node-title">Discord Event Listener</span>
+                        </div>
+                        <p class="node-desc">Lắng nghe sự kiện <code>MESSAGE_CREATE</code> trực tiếp từ Discord WebSocket Gateway.</p>
+                        <div class="node-meta">
+                            <span class="meta-tag">Latency &lt; 50ms</span>
+                            <span class="meta-action">Inspect JSON <i class="fa-solid fa-code"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card" onclick="inspectNode('node-channel-filter')">
+                        <div class="node-header">
+                            <div class="node-icon" style="color: var(--blurple);"><i class="fa-solid fa-filter-circle-dollar"></i></div>
+                            <span class="node-title">Channel Tag Filter</span>
+                        </div>
+                        <p class="node-desc">Kiểm tra Channel ID thuộc danh sách gán nhãn: <code>thông-báo-chung</code>, <code>thông-báo</code>, <code>thông-báo-nhóm</code>, <code>các kênh lớp</code>.</p>
+                        <div class="node-meta">
+                            <span class="meta-tag">Authorization</span>
+                            <span class="meta-action">Inspect Logic <i class="fa-solid fa-code"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card" onclick="inspectNode('node-noise-cleaner')">
+                        <div class="node-header">
+                            <div class="node-icon" style="color: var(--yellow-warning);"><i class="fa-solid fa-broom"></i></div>
+                            <span class="node-title">Spam & Noise Cleaner</span>
+                        </div>
+                        <p class="node-desc">Loại bỏ tin nhắn chào hỏi, icon thả tim, tin nhắn tán tán dẫu off-topic không mang giá trị thông báo.</p>
+                        <div class="node-meta">
+                            <span class="meta-tag">NLP Cleaning</span>
+                            <span class="meta-action">Inspect Logic <i class="fa-solid fa-code"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONNECTOR 1 -> 2 -->
+            <div class="stage-connector">
+                <span class="connector-badge"><i class="fa-solid fa-arrow-down"></i> Raw Notice Payload Normalized</span>
+            </div>
+
+            <!-- STAGE 2: PREPROCESSING & CLASSIFICATION -->
+            <div class="flow-stage" id="stage-2">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <div class="stage-badge">2</div>
+                        <h3>Giai đoạn 2: Phân Loại Ý Định & Đánh Giá Mức Độ Ưu Tiên (Intent & Priority Scoring)</h3>
+                    </div>
+                    <span class="stage-tag"><i class="fa-solid fa-brain"></i> Fast NLP Classifier Model</span>
+                </div>
+
+                <div class="nodes-grid">
+                    <div class="node-card" onclick="inspectNode('node-intent-classifier')">
+                        <div class="node-header">
+                            <div class="node-icon" style="color: var(--cyan-accent);"><i class="fa-solid fa-layer-group"></i></div>
+                            <span class="node-title">Notice Intent Classifier</span>
+                        </div>
+                        <p class="node-desc">Gán nhãn loại thông báo: <strong>Deadline/Bài tập</strong>, <strong>Lịch họp/Sự kiện</strong>, hoặc <strong>Tin tức chung</strong>.</p>
+                        <div class="node-meta">
+                            <span class="meta-tag">Text Categorization</span>
+                            <span class="meta-action">Inspect Schema <i class="fa-solid fa-code"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card" onclick="inspectNode('node-priority-scorer')">
+                        <div class="node-header">
+                            <div class="node-icon" style="color: var(--red-danger);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <span class="node-title">Urgency Scorer</span>
+                        </div>
+                        <p class="node-desc">Chấm điểm khẩn cấp dựa trên từ khóa (Hạn cuối, Gấp, Khẩn) và mốc thời gian phát hiện.</p>
+                        <div class="node-meta">
+                            <span class="meta-tag">Score: High / Med / Low</span>
+                            <span class="meta-action">Inspect Rules <i class="fa-solid fa-code"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card" onclick="inspectNode('node-vector-embedder')">
+                        <div class="node-header">
+                            <div class="node-icon" style="color: var(--green-success);"><i class="fa-solid fa-database"></i></div>
+                            <span class="node-title">Vector Embedding & Storage</span>
+                        </div>
+                        <p class="node-desc">Chuyển đổi thông báo thành Vector Embeddings (768d) và lưu vào Vector DB (ChromaDB / Pinecone).</p>
+                        <div class="node-meta">
+                            <span class="meta-tag">Vector DB Storage</span>
+                            <span class="meta-action">Inspect Index <i class="fa-solid fa-code"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONNECTOR 2 -> 3 -->
+            <div class="stage-connector">
+                <span class="connector-badge"><i class="fa-solid fa-arrow-down"></i> Dispatching to 3 Specialized Feature Engines</span>
+            </div>
+
+            <!-- STAGE 3: 3 CORE FEATURE ENGINES -->
+            <div class="flow-stage" id="stage-3">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <div class="stage-badge">3</div>
+                        <h3>Giai đoạn 3: Thực Thi 3 Tính Năng Core Agent (Multi-Engine Execution)</h3>
+                    </div>
+                    <span class="stage-tag"><i class="fa-solid fa-gears"></i> Parallel Agent Processing</span>
+                </div>
+
+                <div class="flows-three-column">
+                    <!-- Feature 1 -->
+                    <div class="feature-flow-card flow-summary-card">
+                        <div class="feature-header">
+                            <i class="fa-solid fa-newspaper" style="color: var(--blurple);"></i>
+                            <h4>Luồng 1: Tóm Tắt Ngày (Daily Digest)</h4>
+                        </div>
+                        <div class="feature-step-list">
+                            <div class="mini-step">
+                                <div class="step-index">A</div>
+                                <div class="mini-step-content">
+                                    <strong>Cron Job Scheduler Trigger</strong>
+                                    <p>Tự động chạy định kỳ lúc 08:00 (Sáng) & 18:00 (Chiều).</p>
+                                </div>
+                            </div>
+                            <div class="mini-step">
+                                <div class="step-index">B</div>
+                                <div class="mini-step-content">
+                                    <strong>Batch Context Aggregator</strong>
+                                    <p>Gom tin nhắn 24h từ các kênh gán nhãn theo nhóm.</p>
+                                </div>
+                            </div>
+                            <div class="mini-step">
+                                <div class="step-index">C</div>
+                                <div class="mini-step-content">
+                                    <strong>LLM Summarization Prompt</strong>
+                                    <p>Tóm tắt cô đọng 2-3 dòng / thông báo quan trọng.</p>
+                                </div>
+                            </div>
+                            <div class="mini-step">
+                                <div class="step-index">D</div>
+                                <div class="mini-step-content">
+                                    <strong>Discord Embed Generator</strong>
+                                    <p>Tạo thẻ Embed màu sắc theo độ ưu tiên.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="feature-flow-card flow-qa-card">
+                        <div class="feature-header">
+                            <i class="fa-solid fa-comments" style="color: var(--green-success);"></i>
+                            <h4>Luồng 2: Hỏi Đáp Thông Báo (RAG Q&A)</h4>
+                        </div>
+                        <div class="feature-step-list">
+                            <div class="mini-step">
+                                <div class="step-index">A</div>
+                                <div class="mini-step-content">
+                                    <strong>Slash Command `/ask-notice`</strong>
+                                    <p>Người dùng gõ câu hỏi từ giao diện Discord.</p>
+                                </div>
+                            </div>
+                            <div class="mini-step">
+                                <div class="step-index">B</div>
+                                <div class="mini-step-content">
+                                    <strong>Semantic Similarity Search</strong>
+                                    <p>Tìm top 3 tin nhắn khớp nhất trong Vector DB.</p>
+                                </div>
+                            </div>
+                            <div class="mini-step">
+                                <div class="step-index">C</div>
+                                <div class="mini-step-content">
+                                    <strong>Context-Aware Answer Generation</strong>
+                                    <p>LLM tổng hợp câu trả lời ngắn gọn, chuẩn xác.</p>
+                                </div>
+                            </div>
+                            <div class="mini-step">
+                                <div class="step-index">D</div>
+                                <div class="mini-step-content">
+                                    <strong>Citation & Link Source Attribution</strong>
+                                    <p>Gắn kèm liên kết nhảy trực tiếp đến tin gốc.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="feature-flow-card flow-schedule-card">
+                        <div class="feature-header">
+                            <i class="fa-solid fa-calendar-check" style="color: var(--yellow-warning);"></i>
+                            <h4>Luồng 3: Nhắc Lịch Tự Động (Auto Reminders)</h4>
+                        </div>
+                        <div class="feature-step-list">
+                            <div class="mini-step">
+                                <div class="step-index">A</div>
+                                <div class="mini-step-content">
+                                    <strong>Temporal Entity Extraction (NER)</strong>
+                                    <p>Rút trích Ngày/Giờ, Tên bài tập, Hạn nộp từ văn bản.</p>
+                                </div>
+                            </div>
+                            <div class="mini-step">
+                                <div class="step-index">B</div>
+                                <div class="mini-step-content">
+                                    <strong>Task & Deadline Queueing</strong>
+                                    <p>Lưu lịch vào Scheduler Database.</p>
+                                </div>
+                            </div>
+                            <div class="mini-step">
+                                <div class="step-index">C</div>
+                                <div class="mini-step-content">
+                                    <strong>Countdown Alert Dispatcher</strong>
+                                    <p>Bật thông báo Ping <code>@role</code> trước T-24h và T-1h.</p>
+                                </div>
+                            </div>
+                            <div class="mini-step">
+                                <div class="step-index">D</div>
+                                <div class="mini-step-content">
+                                    <strong>Calendar iCal/Google Sync</strong>
+                                    <p>Xuất link thêm nhanh vào Google Calendar.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONNECTOR 3 -> 4 -->
+            <div class="stage-connector">
+                <span class="connector-badge"><i class="fa-solid fa-arrow-down"></i> Dispatching Rich Messages to Discord Server</span>
+            </div>
+
+            <!-- STAGE 4: OUTPUT DISPATCHING -->
+            <div class="flow-stage" id="stage-4">
+                <div class="stage-header">
+                    <div class="stage-title">
+                        <div class="stage-badge">4</div>
+                        <h3>Giai đoạn 4: Xuất Kết Quả & Tương Tác Học Viên (Discord Delivery & Action Handling)</h3>
+                    </div>
+                    <span class="stage-tag"><i class="fa-solid fa-paper-plane"></i> Discord API / Webhook Integration</span>
+                </div>
+
+                <div class="nodes-grid">
+                    <div class="node-card" onclick="inspectNode('node-discord-poster')">
+                        <div class="node-header">
+                            <div class="node-icon" style="color: var(--blurple);"><i class="fa-solid fa-box-archive"></i></div>
+                            <span class="node-title">Discord Rich Embed Publisher</span>
+                        </div>
+                        <p class="node-desc">Đăng các thẻ tóm tắt vào <code>#tóm-tắt-hàng-ngày</code>, <code>#hỏi-đáp-thông-báo</code>, <code>#nhắc-lịch-tự-động</code>.</p>
+                    </div>
+
+                    <div class="node-card" onclick="inspectNode('node-action-buttons')">
+                        <div class="node-header">
+                            <div class="node-icon" style="color: var(--green-success);"><i class="fa-solid fa-gamepad"></i></div>
+                            <span class="node-title">Interactive Component Handler</span>
+                        </div>
+                        <p class="node-desc">Xử lý sự kiện khi học viên bấm nút <code>[ Sync Calendar ]</code>, <code>[ Hỏi chi tiết ]</code>, <code>[ Nhảy tới bài gốc ]</code>.</p>
+                    </div>
+
+                    <div class="node-card" onclick="inspectNode('node-analytics')">
+                        <div class="node-header">
+                            <div class="node-icon" style="color: var(--cyan-accent);"><i class="fa-solid fa-chart-line"></i></div>
+                            <span class="node-title">Feedback & Quality Analytics</span>
+                        </div>
+                        <p class="node-desc">Ghi nhận thống kê số lượng tin nhắn đã xử lý, số lượt hỏi đáp và đánh giá độ chính xác của RAG Engine.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- -------------------------------------------------------------
+           CHANNEL TAG MAPPING MATRIX TABLE
+        ------------------------------------------------------------- -->
+        <div class="matrix-card">
+            <h3 style="color: var(--text-title); font-size: 1.1rem; margin-bottom: 8px;">
+                <i class="fa-solid fa-table-cells" style="color: var(--cyan-accent);"></i> Ma Trận Ánh Xạ Kênh Gán Nhãn & Luồng Xử Lý (Channel Tagging Mapping)
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-sub);">
+                Quy định rõ cách các kênh Discord được theo dõi và định tuyến qua từng luồng AI Agent.
+            </p>
+
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Tên Kênh Discord</th>
+                        <th>Nhãn Phân Loại (Tag)</th>
+                        <th>Loại Thông Báo Xử Lý</th>
+                        <th>Độ Ưu Tiên Mặc Định</th>
+                        <th>Đầu Ra Mục Tiêu (Output Channel)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="channel-badge"><i class="fa-solid fa-hashtag"></i> thông-báo-chung</span></td>
+                        <td><code>General Announcement</code></td>
+                        <td>Thông báo toàn trường, Hạn nộp Hackathon, Quy chế</td>
+                        <td><strong style="color: var(--red-danger);">KHẨN CẤP / HIGH</strong></td>
+                        <td>#tóm-tắt-hàng-ngày, #nhắc-lịch-tự-động</td>
+                    </tr>
+                    <tr>
+                        <td><span class="channel-badge"><i class="fa-solid fa-hashtag"></i> thông-báo</span></td>
+                        <td><code>Official Notice</code></td>
+                        <td>Lịch học, Office Hours Mentor, Slide bài giảng</td>
+                        <td><strong style="color: var(--yellow-warning);">TRUNG BÌNH / MEDIUM</strong></td>
+                        <td>#tóm-tắt-hàng-ngày, #hỏi-đáp-thông-báo</td>
+                    </tr>
+                    <tr>
+                        <td><span class="channel-badge"><i class="fa-solid fa-users"></i> thông-báo-nhóm</span></td>
+                        <td><code>Team Notice</code></td>
+                        <td>Lịch họp nhóm, Phân công công việc, Review nội bộ</td>
+                        <td><strong style="color: var(--yellow-warning);">TRUNG BÌNH / MEDIUM</strong></td>
+                        <td>#tóm-tắt-hàng-ngày, #nhắc-lịch-tự-động</td>
+                    </tr>
+                    <tr>
+                        <td><span class="channel-badge"><i class="fa-solid fa-code"></i> lớp-python-k4</span></td>
+                        <td><code>Classroom Channel</code></td>
+                        <td>Bài tập Python, Slide FastAPI, Hạn nộp OOP</td>
+                        <td><strong style="color: var(--green-success);">TIÊU CHUẨN / NORMAL</strong></td>
+                        <td>#tóm-tắt-hàng-ngày, #hỏi-đáp-thông-báo</td>
+                    </tr>
+                    <tr>
+                        <td><span class="channel-badge"><i class="fa-solid fa-laptop-code"></i> lớp-web-k4</span></td>
+                        <td><code>Classroom Channel</code></td>
+                        <td>Bài tập Frontend, HTML/CSS Spec, Tài liệu mẫu</td>
+                        <td><strong style="color: var(--green-success);">TIÊU CHUẨN / NORMAL</strong></td>
+                        <td>#tóm-tắt-hàng-ngày, #hỏi-đáp-thông-báo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- -------------------------------------------------------------
+           INSPECTOR CODE / DATA PAYLOAD MODAL
+        ------------------------------------------------------------- -->
+        <div class="inspector-panel" id="inspector-box">
+            <div class="inspector-header">
+                <span id="inspector-title"><i class="fa-solid fa-code"></i> Data Payload & Schema Inspector</span>
+                <span style="font-size: 0.75rem; color: var(--text-sub);">Nhấp vào bất kỳ Node nào ở trên để xem dữ liệu JSON mẫu</span>
+            </div>
+
+            <div class="code-block" id="inspector-content">
+<span class="code-keyword">struct</span> <span class="code-key">NoticePayload</span> {
+  <span class="code-key">message_id</span>: <span class="code-string">"1289347129038"</span>,
+  <span class="code-key">channel_name</span>: <span class="code-string">"thông-báo-chung"</span>,
+  <span class="code-key">author</span>: <span class="code-string">"BTC Hackathon"</span>,
+  <span class="code-key">raw_text</span>: <span class="code-string">"📢 Hạn nộp AI Spec là 23:59 hôm nay (30/07)..."</span>,
+  <span class="code-key">importance_score</span>: <span class="code-number">0.95</span>, <span class="code-keyword">// HIGH PRIORITY</span>
+  <span class="code-key">extracted_entities</span>: {
+    <span class="code-key">date</span>: <span class="code-string">"2026-07-30T23:59:00"</span>,
+    <span class="code-key">task</span>: <span class="code-string">"Nộp spec.md vào GitHub repo"</span>
+  }
+}
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Interactive Node Inspector Code Samples
+        const nodeData = {
+            'node-discord-listener': {
+                title: 'Node 1.1: Discord Event Listener Payload',
+                code: `{
+  "event": "MESSAGE_CREATE",
+  "data": {
+    "id": "12847291039281",
+    "channel_id": "992837410293",
+    "channel_name": "thông-báo-chung",
+    "author": { "username": "GiangVien_AI", "bot": false },
+    "content": "📢 Tất cả các nhóm nộp bài AI Spec trước 23:59 hôm nay nhé!",
+    "timestamp": "2026-07-30T14:00:00.000Z"
+  }
+}`
+            },
+            'node-channel-filter': {
+                title: 'Node 1.2: Channel Tag Filter Logic',
+                code: `// Matching Channel Tag Logic
+const MONITORED_CHANNELS = [
+  "thông-báo-chung",
+  "thông-báo",
+  "thông-báo-nhóm",
+  "lớp-python-k4",
+  "lớp-web-k4"
+];
+
+function isChannelAllowed(channelName) {
+  return MONITORED_CHANNELS.includes(channelName);
+}`
+            },
+            'node-noise-cleaner': {
+                title: 'Node 1.3: NLP Spam & Noise Removal Rules',
+                code: `// Noise Filtering Pipeline
+const IGNORED_PATTERNS = [
+  /^hi$/i, /^hello$/i, /^cảm ơn/i, /^ok/i, /^dạ/i, /^thả tim/i
+];
+
+function filterNoise(content) {
+  if (content.length < 5) return false;
+  return !IGNORED_PATTERNS.some(rgx => rgx.test(content));
+}`
+            },
+            'node-intent-classifier': {
+                title: 'Node 2.1: Intent Classification Output Schema',
+                code: `{
+  "intent": "DEADLINE_NOTICE",
+  "confidence": 0.98,
+  "categories": ["HACKATHON", "SPEC_SUBMISSION"],
+  "target_channels": ["#tóm-tắt-hàng-ngày", "#nhắc-lịch-tự-động"]
+}`
+            },
+            'node-priority-scorer': {
+                title: 'Node 2.2: Urgency Scoring Engine Output',
+                code: `{
+  "urgency_level": "HIGH",
+  "urgency_score": 9.5,
+  "reasons": [
+    "Contains keyword: 'Hạn nộp'",
+    "Time remaining < 12 hours"
+  ],
+  "embed_color": "#ED4245" // Red Danger
+}`
+            },
+            'node-vector-embedder': {
+                title: 'Node 2.3: Vector Embedding & ChromaDB Payload',
+                code: `{
+  "id": "notice_12847291039281",
+  "vector": [0.024, -0.192, 0.881, ... 768 dimensions],
+  "metadata": {
+    "channel": "thông-báo-chung",
+    "date": "2026-07-30",
+    "topic": "Hackathon AI Spec"
+  }
+}`
+            }
+        };
+
+        function inspectNode(nodeId) {
+            document.querySelectorAll('.node-card').forEach(n => n.classList.remove('active-step'));
+            event.currentTarget.classList.add('active-step');
+
+            const info = nodeData[nodeId] || {
+                title: `Node Inspector: ${nodeId}`,
+                code: `// Sample payload for ${nodeId}\n{\n  "status": "active",\n  "stage": "processing"\n}`
+            };
+
+            document.getElementById('inspector-title').innerHTML = `<i class="fa-solid fa-code"></i> ${info.title}`;
+            document.getElementById('inspector-content').innerText = info.code;
+            
+            // Scroll to inspector smoothly
+            document.getElementById('inspector-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function runWorkflowAnimation() {
+            const btn = document.querySelector('.btn-action.primary');
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang Mô Phỏng Dữ Liệu Chạy Khắp Pipeline...`;
+
+            const stages = ['stage-1', 'stage-2', 'stage-3', 'stage-4'];
+            let current = 0;
+
+            const interval = setInterval(() => {
+                stages.forEach(s => document.getElementById(s).style.borderColor = 'rgba(255,255,255,0.1)');
+                
+                if (current < stages.length) {
+                    const el = document.getElementById(stages[current]);
+                    el.style.borderColor = 'var(--cyan-accent)';
+                    el.style.boxShadow = '0 0 20px rgba(0, 242, 254, 0.2)';
+                    current++;
+                } else {
+                    clearInterval(interval);
+                    btn.innerHTML = `<i class="fa-solid fa-check"></i> Đã hoàn thành 1 chu trình quét Realtime!`;
+                    setTimeout(() => {
+                        btn.innerHTML = `<i class="fa-solid fa-play"></i> Mô Phỏng Luồng Dữ Liệu Realtime`;
+                        stages.forEach(s => {
+                            document.getElementById(s).style.borderColor = 'rgba(255,255,255,0.1)';
+                            document.getElementById(s).style.boxShadow = 'none';
+                        });
+                    }, 2000);
+                }
+            }, 800);
+        }
+    </script>
+</body>
+</html>
