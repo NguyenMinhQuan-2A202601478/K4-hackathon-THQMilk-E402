@@ -48,12 +48,27 @@ def format_vietnam_time(dt: datetime) -> str:
 
 
 async def fetch_live_discord_messages(guild: discord.Guild) -> dict[str, list[dict]]:
-    """STAGE 2: RULE-BASED DATA FILTERING - Fetch candidate live messages."""
+    """STAGE 2: RULE-BASED DATA FILTERING - Fetch candidate live messages from text channels and threads."""
     live_channels_data: dict[str, list[dict]] = {}
     
-    for channel in guild.text_channels:
+    # Collect all readable text channels and active threads
+    all_channels = list(guild.text_channels)
+    try:
+        all_channels.extend(guild.threads)
+    except Exception:
+        pass
+
+    print(f"🔍 SCANNING {len(all_channels)} CHANNELS & THREADS ON SERVER: '{guild.name}'...")
+
+    for channel in all_channels:
         try:
-            cat_prefix = f"[{channel.category.name}] " if channel.category else ""
+            # Check Bot permissions on this channel
+            perms = channel.permissions_for(guild.me)
+            if not perms.read_messages or not perms.read_message_history:
+                print(f"⚠️ [PERMISSION DENIED] Bot lacks 'Read Message History' permission for #{channel.name}")
+                continue
+
+            cat_prefix = f"[{channel.category.name}] " if getattr(channel, "category", None) else ""
             full_channel_name = f"{cat_prefix}#{channel.name}"
 
             channel_msgs = []
@@ -67,7 +82,8 @@ async def fetch_live_discord_messages(guild: discord.Guild) -> dict[str, list[di
                     "content": content
                 }
                 
-                if RuleBasedFilter.is_candidate(msg_dict):
+                # Rule-Based Filter Check (Channel Name Awareness)
+                if RuleBasedFilter.is_candidate(msg_dict, full_channel_name):
                     time_str = format_vietnam_time(msg.created_at)
                     channel_msgs.append({
                         "id": str(msg.id),
@@ -78,7 +94,11 @@ async def fetch_live_discord_messages(guild: discord.Guild) -> dict[str, list[di
                     })
 
             if channel_msgs:
+                print(f"   ✅ '{full_channel_name}': Found {len(channel_msgs)} candidate messages.")
                 live_channels_data[full_channel_name] = channel_msgs
+            else:
+                print(f"   ℹ️ '{full_channel_name}': 0 candidate messages.")
+
         except Exception as exc:
             print(f"⚠️ Could not fetch history for channel #{channel.name}: {exc}")
                 
@@ -100,7 +120,7 @@ def create_bot():
     async def on_ready():
         print("=" * 75)
         print(f"🤖 DISCORD BOT LIVE ONLINE: {bot.user.name} (ID: {bot.user.id})")
-        print("🛡️ NÂNG CẤP CHỐNG BỊA CHUYỆN: Kiểm tra Kênh/Danh mục thực tế, 100% dựa trên tin nhắn nguồn!")
+        print("🛡️ KÊNH ĐÃ QUÉT DỮ LIỆU SẴN SÀNG: Tự động quét 100% Kênh mới tạo & Kênh #thông-báo-chung!")
         print("=" * 75)
 
     @bot.event
@@ -121,7 +141,7 @@ def create_bot():
         if is_mentioned:
             clean_question = content.replace(f"<@{bot.user.id}>", "").replace(f"<@!{bot.user.id}>", "").strip()
 
-            # STAGE 1: PRE-GUARDRAIL
+            # STAGE 1: PRE-GUARDRAIL (Input safety & strict scope partitioning firewall)
             pre_res = guardrail_pipeline.process_input(clean_question)
 
             if not pre_res.is_safe:
@@ -139,7 +159,7 @@ def create_bot():
                     live_data = await fetch_live_discord_messages(message.guild)
 
                     if not live_data or all(len(msgs) == 0 for msgs in live_data.values()):
-                        await message.channel.send("📢 **Hiện tại trên Server Discord chưa có tin nhắn thông báo nào được gửi.**")
+                        await message.channel.send("📢 **Hiện tại trên Server Discord chưa có tin nhắn thông báo nào được ghi nhận.**\n\n*(Lưu ý: Hãy chắc chắn Bot có quyền View Channel / Read Message History trong kênh mới tạo nhé!)*")
                         return
 
                     all_source_msgs = []
@@ -149,21 +169,25 @@ def create_bot():
                             all_source_msgs.append(m)
                             context_snippets.append(f"[Kênh {full_ch_name}] [{m.get('author')}] [Thời gian: {m.get('timestamp')}]: {m.get('content')}")
 
-                    # STAGE 3: LLM REASONING (Strict Grounding & Zero Hallucination Policy)
+                    # STAGE 3: LLM REASONING (Strict Domain Boundary Rule & Specific Channel Matching)
                     provider = make_provider("openai")
                     
                     system_prompt = """You are the Senior Discord Notice Agent, a strict administrative assistant for a student learning community.
 
-STRICT ZERO HALLUCINATION & CONTEXT GROUNDING (CHỐNG BỊA CHUYỆN & ĐOÁN BỪA):
-1. **ANCHOR RULE**: Your answer MUST be based 100% on the provided RETRIEVED DISCORD MESSAGES. Do not use your external pre-trained knowledge or guess facts.
-2. **VERIFY CATEGORY & CHANNEL FIRST**: Inspect the exact channel category and content of the retrieved messages before making any statement. Never infer announcements from channels that don't have them!
-3. **EXPLICIT MISSING EVIDENCE RESPONSE**: If the user asks for a schedule, deadline, link, or information that is NOT explicitly written in the retrieved channel messages, YOU MUST STATE: "Hiện tại hệ thống chưa ghi nhận thông báo nào về thông tin này." (or equivalent translated to user's language).
-4. **NO GUESSING**: NEVER invent, guess, or infer dates, URLs, Meeting IDs, passcodes, or regulations.
+STRICT DOMAIN BOUNDARY MANDATE (PHÂN VÙNG THẨM QUYỀN):
+- You are EXCLUSIVELY a Discord Announcement Agent.
+- DO NOT answer general programming theory, coding tutorials, OOP concepts, or academic explanations (e.g. "OOP là gì?", "FastAPI dùng làm gì?", "What is OOP?", "Write Python code").
+- If the user asks an academic or general knowledge question, respond strictly: "Dạ xin lỗi bạn nha 😅! Mình là Bot hỗ trợ tra cứu thông báo và lịch học của khóa. Mình không được phép trả lời các câu hỏi lý thuyết ngoài lề hoặc viết code/giải bài tập hộ nhé! 🌸"
+
+STRICT ZERO HALLUCINATION & SPECIFIC CHANNEL MATCHING:
+1. ANCHOR RULE: Your answer MUST be based 100% on the provided RETRIEVED DISCORD MESSAGES.
+2. SPECIFIC CHANNEL/CATEGORY MATCHING: If the user asks for announcements in a specific category or channel (e.g. "LỚP HỌC - KHÓA 3" or "#thông-báo-chung"), inspect all retrieved messages matching that channel tag (e.g. `[LỚP HỌC - KHÓA 3] #thông-báo-chung`) and summarize them!
+3. EXPLICIT MISSING EVIDENCE RESPONSE: ONLY return "Hiện tại hệ thống chưa ghi nhận thông báo nào về thông tin này." if there are literally ZERO messages retrieved for that channel/category, or if the user asks for information not present in the retrieved text.
+4. NO GUESSING: NEVER invent, guess, or infer dates, URLs, Meeting IDs, passcodes, or regulations.
 
 UNIVERSAL ANY-LANGUAGE ADAPTATION MANDATE:
 1. Automatically detect the EXACT language of the user's input question.
-2. Translate and write ALL response text — including event titles, summaries, field labels/headers, link descriptions, and mandatory rules — ENTIRELY in that EXACT SAME USER LANGUAGE!
-3. NEVER mix languages or output combined slash `/` headers.
+2. Translate and write ALL response text ENTIRELY in that EXACT SAME USER LANGUAGE!
 
 EXACT HEADER TEMPLATES BASED ON USER LANGUAGE:
 
@@ -172,7 +196,7 @@ IF USER ASKS IN VIETNAMESE:
 - 📍 **Kênh nguồn**: `[Danh mục] #kênh` | **Thời gian**: HH:MM AM/PM DD/MM/YYYY
 - 📝 **Tóm tắt nội dung**: ...
 - 🔗 **Link & Thông tin tham gia**: [Tên Link](url) | **Meeting ID**: ... | **Passcode**: ...
-- ⚠️ **Quy định / Lưu ý quan trọng**: ...
+- ⚠️ **Quy định quan trọng**: ...
 
 IF USER ASKS IN ENGLISH:
 📌 **[Announcement Title]**
