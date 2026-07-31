@@ -43,11 +43,11 @@ Loại: [x] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
 - **Bảng impact ≥3 ứng viên (100% dựa trên bằng chứng khảo sát n=43 & data export Discord thực tế)**:
 
-| Ứng viên                                                                                     | Bao nhiêu người gặp (Evidence đếm được)                                                   | Tần suất                        | Mỗi lần tốn gì                                                                    | Khả thi build (1.5 ngày)                                                         | Chọn?              |
-| ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------- |
-| **1. Agent Tóm tắt & Trích xuất Thông báo Hằng ngày (Discord Daily Digest)**     | **651 người** (72.1% từ 43 HV khảo sát & 42% tin đính chính từ 19 tin Discord gốc) | Hằng ngày (1-2 lần/ngày)      | 20-30 phút lội chat/lần (= ~217 giờ/ngày) + rủi ro trừ 10-20% điểm trễ hạn | **Cao** (đã có Loader + Pre-Guardrail + LLM Extractor)                    | **[x] CHỌN** |
-| **2. Bot Q&A Tự động trả lời thắc mắc bài tập 24/7**                            | **350 người** (35% thắc mắc lặp từ khảo sát + 5 TA)                                  | 2-3 lần/tuần                    | TA tốn 60-90 phút/ngày gõ lại template + HV chờ TA 2-4h                         | **Trung bình** (cần RAG giáo trình, cost-of-error trả lời sai đắt)   | [ ] LOẠI           |
-| **3. Bot Tự động gửi tin nhắn riêng (DM/Email) nhắc cá nhân nộp bài** | **300 người** (30% học viên gặp khó khăn từ khảo sát)                              | 1-2 lần/tuần (khi có bài lab) | HV tốn 2-3 giờ mò lỗi một mình + gián đoạn đà học tập                    | **Thấp** (AI phán đoán lỗi phức tạp kém, rủi ro sửa sai gây rối) | [ ] LOẠI           |
+| Ứng viên                                                                                 | Bao nhiêu người gặp (Evidence đếm được)                                                   | Tần suất                        | Mỗi lần tốn gì                                                                    | Khả thi build (1.5 ngày)                                                         | Chọn?              |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------- |
+| **1. Agent Tóm tắt & Trích xuất Thông báo Hằng ngày (Discord Daily Digest)** | **651 người** (72.1% từ 43 HV khảo sát & 42% tin đính chính từ 19 tin Discord gốc) | Hằng ngày (1-2 lần/ngày)      | 20-30 phút lội chat/lần (= ~217 giờ/ngày) + rủi ro trừ 10-20% điểm trễ hạn | **Cao** (đã có Loader + Pre-Guardrail + LLM Extractor)                    | **[x] CHỌN** |
+| **2. Bot Q&A Tự động trả lời thắc mắc bài tập 24/7**                        | **350 người** (35% thắc mắc lặp từ khảo sát + 5 TA)                                  | 2-3 lần/tuần                    | TA tốn 60-90 phút/ngày gõ lại template + HV chờ TA 2-4h                         | **Trung bình** (cần RAG giáo trình, cost-of-error trả lời sai đắt)   | [ ] LOẠI           |
+| **3. Bot Tự động gửi tin nhắn riêng (DM/Email) nhắc cá nhân nộp bài**     | **300 người** (30% học viên gặp khó khăn từ khảo sát)                              | 1-2 lần/tuần (khi có bài lab) | HV tốn 2-3 giờ mò lỗi một mình + gián đoạn đà học tập                    | **Thấp** (AI phán đoán lỗi phức tạp kém, rủi ro sửa sai gây rối) | [ ] LOẠI           |
 
 - **Ứng viên ĐÃ LOẠI + vì sao (bằng con số evidence & cost-of-error)**:
   - *Loại Ứng viên 3*: Việc tự động gửi tin nhắn cá nhân (DM/Email) vi phạm quyền riêng tư tin nhắn của học viên, gây rủi ro spam inbox làm phiền người dùng, đồng thời không giải quyết được gốc rễ vấn đề tổng hợp tin nhắn bị trôi trên các kênh thông báo chung.
@@ -134,7 +134,7 @@ Loại: [x] Tối ưu tính năng có sẵn  [x] Tính năng mới
 - **Khi bị đòi ngoài phạm vi (③)**:
   - User gõ lệnh đòi bot giải bài tập Python hoặc yêu cầu lộ API Key -> Pre-Guardrail chặn và phản hồi: *"Yêu cầu nằm ngoài thẩm quyền. Bot chỉ phụ trách quét & tóm tắt thông báo chính thức."*
 - **Case đặc thù domain (④)**:
-  - Phát hiện tin đồn hoãn deadline phát tán từ tài khoản học viên thường -> Bot không đưa vào bản tin chính thức, đưa vào mục *"Tin nhắn chưa xác thực cần lưu ý"* và yêu cầu mã xác thực từ ban tổ chức (`BTC-VERIFIED`).
+  - Phát hiện tin đồn hoãn deadline phát tán từ tài khoản học viên thường -> Bot không đưa vào bản tin chính thức, đưa vào mục *"Tin nhắn chưa xác thực cần lưu ý"*.
 
 ---
 
@@ -156,15 +156,16 @@ Loại: [x] Tối ưu tính năng có sẵn  [x] Tính năng mới
 | --------------------------------- | ---------------- | --------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Lượt 1 (Nháp)**        | 2026-07-31 09:00 | 11 / 20               | 55.0%             | Thiếu Pre-Guardrail, dễ bị dính Prompt Injection & nhầm lẫn mốc giờ cũ.                                                                                                       |
 | **Lượt 2 (Chính thức)** | 2026-07-31 10:23 | 14 / 20               | **70.0%**   | Đã thêm Pre-Guardrail chặn Injection (SEC PASS 100%). Nhóm đánh giá trên bộ**Hard Benchmark** nên dừng ở 70% (báo cáo trung thực khoảng cách so với bar 85%). |
+| **Lượt 2 (Chính thức)** | 2026-07-31 10:23 | 14 / 20               | **70.0%**   | Đã thêm Pre-Guardrail chặn Injection (SEC PASS 100%). Nhóm đánh giá trên bộ**Hard Benchmark** nên dừng ở 70% (báo cáo trung thực khoảng cách so with bar 85%). |
 
 ---
 
 ## §8. Phân công & kế hoạch
 
 - **Phân công có tên**:
-  - *Spec Risks & Slide Lead*: **Thành viên 1** — Phụ trách `spec.md` (§5-§6), `demo-slides.pdf`, `README.md`, rà soát rủi ro & quy trình.
-  - *AI & Prototype Lead*: **Thành viên 2** — Phụ trách `codebase/` (`app.py`, `discord_bot.py`, `guardrail.py`, tích hợp OpenAI/Gemini API).
-  - *Eval & User Validation Lead*: **Thành viên 3** — Phụ trách `eval/` (`golden_set.json`, `run_eval_discord.py`), `validation/` (`feedback_log.md`), `spec.md` (§7).
+  - *Spec Risks & Slide Lead (Leader)*: **Nguyễn Quang Huy** (`2A202601314`) — Phụ trách `spec.md` (§5-§6), `demo-slides.pdf` / `demo-slides.md`, `README.md`, rà soát rủi ro & quy trình.
+  - *AI Dev (Prototype Lead)*: **Nguyễn Minh Quân** (`2A202601478`) — Phụ trách `codebase/` (`app.py`, `discord_bot.py`, `guardrail.py`, tích hợp OpenAI/Gemini API).
+  - *Eval & User Validation Lead*: **Trần Gia Thế** (`2A202601062`) — Phụ trách `eval/` (`golden_set.json`, `run_eval_discord.py`), `validation/` (`feedback_log.md`), `spec.md` (§7).
 - **Willing users (≥3 tên) + kế hoạch vòng validation CP5**:
   - *Willing users (Trích xuất từ 37/43 học viên đồng ý trong khảo sát Excel)*: Phùng Thị Trà My (Learner Cohort 4), Nguyễn Văn Minh (Team G-23), Lê Thị Thanh Hương (Lab Coach/TA), Phạm Quốc Bảo (Cohort 3), Đỗ Anh Tuấn (Product Lead Peer Team).
   - *Kế hoạch validation*: Giao task lội tin nhắn 2 ngày bận -> Cho sử dụng bản tin Daily Digest -> Ghi nhận log 3 câu hỏi (Khó hiểu/Khó chịu? Có tin không? Có dùng thật không?) đối chiếu với kết quả tại [validation/feedback_log.md](file:///c:/Users/huyqu/Desktop/ai-thuc-chien/K4-hackathon-THQMilk-E402/validation/feedback_log.md).

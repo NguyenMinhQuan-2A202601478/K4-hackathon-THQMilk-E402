@@ -12,26 +12,26 @@
 3. Viết spec theo **`03-template-ai-spec.md`** — deliverable trung tâm của cả sự kiện.
 4. Đọc **`04-rubric.md`** ngay từ đầu — biết trước bài được chấm theo tiêu chí nào.
 
-| File / thư mục | Nội dung |
-|---|---|
-| `01-de-bai.md` | Đề bài 3 hướng · 5 tiêu chí nghiệm thu · ràng buộc chung |
-| `02-guide.md` | Hướng dẫn 5 giai đoạn: khám phá → spec → build → đo & validate → demo |
-| `03-template-ai-spec.md` | Template AI Spec (nộp 23:59 ngày 1) |
-| `04-rubric.md` | Rubric 100 điểm (25 nộp checkpoint + 75 chấm bài) + checklist xác minh 6 mốc |
-| `data/` | Dữ liệu thật đã ẩn danh: chatlog VLearn tutor + 6 transcript bài giảng + 2 bộ slide bản hackathon — dùng để tìm bằng chứng và xây golden set |
-| `tham-khao/` | JTBD Playbook (PDF) + worksheet JTBD đầy đủ — đọc khi muốn đào sâu |
+| File / thư mục           | Nội dung                                                                                                                                                       |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `01-de-bai.md`           | Đề bài 3 hướng · 5 tiêu chí nghiệm thu · ràng buộc chung                                                                                            |
+| `02-guide.md`            | Hướng dẫn 5 giai đoạn: khám phá → spec → build → đo & validate → demo                                                                               |
+| `03-template-ai-spec.md` | Template AI Spec (nộp 23:59 ngày 1)                                                                                                                           |
+| `04-rubric.md`           | Rubric 100 điểm (25 nộp checkpoint + 75 chấm bài) + checklist xác minh 6 mốc                                                                             |
+| `data/`                  | Dữ liệu thật đã ẩn danh: chatlog VLearn tutor + 6 transcript bài giảng + 2 bộ slide bản hackathon — dùng để tìm bằng chứng và xây golden set |
+| `tham-khao/`             | JTBD Playbook (PDF) + worksheet JTBD đầy đủ — đọc khi muốn đào sâu                                                                                   |
 
 ## Lịch — 6 mốc
 
-| Mốc | Khoá 3 | Khoá 4 |
-|---|---|---|
-| Khai mạc + phát đề | 09:00 ngày 1 | 14:00 ngày 1 |
-| CP1 · Chốt Canvas | 10:00 ngày 1 | 15:00 ngày 1 |
-| CP2 · Show được thứ bấm được | 12:00 ngày 1 | 17:00 ngày 1 |
-| CP3 · AI chạy thật + đo lượt đầu | 16:00 ngày 1 | 10:30 ngày 2 |
-| CP4 · Chốt tiến độ — spec nộp hạn cứng **23:59 ngày 1** | 17:30 ngày 1 | 12:00 ngày 2 |
-| CP5 · Xác minh + validation + dry run | 09:00 ngày 2 | 14:00 ngày 2 |
-| CP6 · Demo | 10:00 ngày 2 | 15:00 ngày 2 |
+| Mốc                                                                   | Khoá 3       | Khoá 4       |
+| ---------------------------------------------------------------------- | ------------- | ------------- |
+| Khai mạc + phát đề                                                 | 09:00 ngày 1 | 14:00 ngày 1 |
+| CP1 · Chốt Canvas                                                    | 10:00 ngày 1 | 15:00 ngày 1 |
+| CP2 · Show được thứ bấm được                                  | 12:00 ngày 1 | 17:00 ngày 1 |
+| CP3 · AI chạy thật + đo lượt đầu                               | 16:00 ngày 1 | 10:30 ngày 2 |
+| CP4 · Chốt tiến độ — spec nộp hạn cứng**23:59 ngày 1** | 17:30 ngày 1 | 12:00 ngày 2 |
+| CP5 · Xác minh + validation + dry run                                | 09:00 ngày 2 | 14:00 ngày 2 |
+| CP6 · Demo                                                            | 10:00 ngày 2 | 15:00 ngày 2 |
 
 Mỗi mốc cần show gì và được xác minh thế nào: xem bảng trong `04-rubric.md`.
 
@@ -50,18 +50,20 @@ repo/
 └── reflection/        ← mỗi người 1 file
 ```
 
-### Bảng phân công nhiệm vụ nhóm 3 Thành viên (Giai đoạn tiếp theo - R1 & R2 đã xong ✅)
+### Bảng Phân Công Nhiệm Vụ Nhóm 3 Thành Viên (Nhóm THQMilk · Zone E402)
 
-> 🟢 **Trạng thái:** Phần **R1** (`spec.md` §1-§2) và **R2** (`spec.md` §4) đã hoàn thành xuất sắc (**30/75 điểm**).
+| Thành viên | Mã HV | Vai trò | Phụ trách File / Thư mục chính | File Reflection Cá Nhân | Nhiệm vụ chính & Trách nhiệm Demo |
+|---|---|---|---|---|---|
+| **Nguyễn Quang Huy** | `2A202601314` | **Spec Risks & Slide, Leader** | `spec.md` (§5-§6)<br>`demo-slides.pdf` / `demo-slides.md`<br>`README.md` | [reflection.md#1-reflection-cá-nhân--thành-viên-1-nguyễn-quang-huy](file:///c:/Users/huyqu/Desktop/ai-thuc-chien/K4-hackathon-THQMilk-E402/reflection.md#1-reflection-cá-nhân--thành-viên-1-nguyễn-quang-huy)<br>*(hoặc [reflection/thanh-vien-1-nguyen-quang-huy.md](file:///c:/Users/huyqu/Desktop/ai-thuc-chien/K4-hackathon-THQMilk-E402/reflection/thanh-vien-1-nguyen-quang-huy.md))* | • Viết §5 & §6 trong `spec.md` (4 lớp chỗ khó & 8 kịch bản rủi ro).<br>• Biên soạn Slide pitch 6 trang theo luật *"không bằng chứng thì không có slide"*.<br>• Thuyết trình Slide 1 & Slide 2 tại Demo Round. |
+| **Nguyễn Minh Quân** | `2A202601478` | **AI Dev** | `codebase/`<br>(`guardrail.py`, `discord_bot.py`, `app.py`) | [reflection.md#2-reflection-cá-nhân--thành-viên-2-nguyễn-minh-quân](file:///c:/Users/huyqu/Desktop/ai-thuc-chien/K4-hackathon-THQMilk-E402/reflection.md#2-reflection-cá-nhân--thành-viên-2-nguyễn-minh-quân)<br>*(hoặc [reflection/thanh-vien-2-nguyen-minh-quan.md](file:///c:/Users/huyqu/Desktop/ai-thuc-chien/K4-hackathon-THQMilk-E402/reflection/thanh-vien-2-nguyen-minh-quan.md))* | • Xây dựng tầng Pre-Guardrail 0ms chống Injection & LLM Extractor 5 phần.<br>• Lập trình Streamlit Dashboard & Discord Bot Simulator UI.<br>• Trực tiếp chạy Demo Live 2 Cases & Thẻ Giám Khảo. |
+| **Trần Gia Thế** | `2A202601062` | **Eval & User Validation Lead** | `eval/`<br>`validation/`<br>`spec.md` (§7) | [reflection.md#3-reflection-cá-nhân--thành-viên-3-trần-gia-thế](file:///c:/Users/huyqu/Desktop/ai-thuc-chien/K4-hackathon-THQMilk-E402/reflection.md#3-reflection-cá-nhân--thành-viên-3-trần-gia-thế)<br>*(hoặc [reflection/thanh-vien-3-tran-gia-the.md](file:///c:/Users/huyqu/Desktop/ai-thuc-chien/K4-hackathon-THQMilk-E402/reflection/thanh-vien-3-tran-gia-the.md))* | • Xây dựng Golden Set 20 cases & script `run_eval_discord.py` tự động đo.<br>• Thu thập log khảo sát n=43 & 5 Willing Users feedback.<br>• Thuyết trình Slide 4 (70% vs Bar 85%), Slide 5 & Slide 6. |
 
-| Thành viên | Vai trò | Phụ trách File / Phần | Nhiệm vụ chi tiết phần còn lại | Tiêu chí Rubric còn lại |
-|---|---|---|---|---|
-| **Thành viên 1** | **Spec Risks & Slide Lead** | `spec.md` (§5-§6)<br>`demo-slides.pdf`<br>`README.md` | • Viết §5 & §6 trong `spec.md` (Chỗ khó kỹ thuật AI & Kịch bản rủi ro/fallback).<br>• Làm slide pitch 6 trang `demo-slides.pdf`.<br>• Rà soát tổng thể repo & theo dõi nộp bài CP4 & CP5. | **R3 (11đ)**: Chỗ khó & Rủi ro<br>**R7 (3đ)**: Quy trình & Repo<br>**Demo Pitch** |
-| **Thành viên 2** | **AI & Prototype Lead** | `codebase/` | • Hoàn thiện Prototype trong `codebase/` (Discord Bot / Mock Flow HTML + ≥1 lời gọi AI thật).<br>• Tích hợp luồng xử lý dữ liệu tin nhắn từ 4 kênh gán nhãn.<br>• Nắm chắc code để giải thích tại vòng phỏng vấn CP5 (*Vibe-coding rule*). | **R5 (8đ)**: Prototype chạy được |
-| **Thành viên 3** | **Eval & User Validation Lead** | `eval/`<br>`validation/`<br>`spec.md` (§7) | • Xây dựng Golden Set & bảng kết quả chạy đo lường trong `eval/`.<br>• Thu thập log feedback từ vòng user test trong `validation/`.<br>• Viết §7 trong `spec.md` (Khung kiểm thử & Đo lường). | **R4 (15đ)**: Kiểm thử & Golden set<br>**R6 (8đ)**: Validation với User |
+---
 
-*(Lưu ý: Tất cả 3 thành viên đều phải tự viết 1 file thu hoạch cá nhân trong thư mục `reflection/`)*
-
+### 🛡️ Bộ Trả Lời 3 Câu Hỏi Cốt Lõi Vibe-Coding / Audit (Cả nhóm đã luyện tập):
+1. **"Augment hay Automate — vì sao?"**: **Conditional Automation (Bổ trợ con người)**. Tự động hóa 100% khi thông báo rõ ràng (tiết kiệm 217h/ngày). Chuyển sang con người (Augment) khi có đính chính mâu thuẫn mốc giờ *(Cost-of-error rất đắt: trễ hạn nộp bài)* bằng cách xuất cả 2 mốc kèm Timestamp hoặc cảnh báo *"Cần TA xác minh"* (HAX G10 & PAIR Graceful Failure).
+2. **"Failure nguy hiểm nhất?"**: **Conflicting Announcement Misresolution (Xử lý sai hoặc bỏ sót mốc đính chính khi có nhiều thông báo xung đột)**. Kết quả đo thực tế ở hạng mục này chỉ đạt **40.0% PASS (2/5 cases)**. Nhóm công khai trung thực chỉ số này trên Hard Benchmark để nâng cấp Vector DB (ChromaDB) ở tuần tiếp theo.
+3. **"Phần bạn làm là gì?"**: Nguyễn Quang Huy phụ trách Spec Rủi ro & Slide pitch, Leader; Nguyễn Minh Quân phụ trách AI Dev (Codebase Architecture: Pre-Guardrail 0ms + LLM Summarizer + Streamlit/Discord UI); Trần Gia Thế phụ trách Eval Golden Set (20 cases) & User Validation Survey (n=43).
 
 
 ## Chấm điểm
@@ -72,15 +74,15 @@ Tổng **100 điểm = 25 điểm nộp checkpoint + 75 điểm chấm bài nộ
 
 **75 điểm chấm — trên artifact trong repo, mỗi con điểm trỏ về một file:**
 
-| Khối | Điểm | Chấm trên file nào |
-|---|---|---|
-| R1 · Bằng chứng & impact | 15 | `spec.md` §1-§2 + log khảo sát/mining |
-| R2 · Lát cắt & thiết kế | 15 | `spec.md` §4 |
-| R3 · Chỗ khó & kịch bản rủi ro | 11 | `spec.md` §5-§6 |
-| R4 · Kiểm thử | 15 | `spec.md` §7 + `eval/` |
-| R5 · Prototype chạy được | 8 | `codebase/` + demo |
-| R6 · Validation với user | 8 | `validation/` |
-| R7 · Quy trình & repo | 3 | cấu trúc repo |
+| Khối                                | Điểm | Chấm trên file nào                       |
+| ------------------------------------ | ------ | ------------------------------------------- |
+| R1 · Bằng chứng & impact          | 15     | `spec.md` §1-§2 + log khảo sát/mining |
+| R2 · Lát cắt & thiết kế         | 15     | `spec.md` §4                             |
+| R3 · Chỗ khó & kịch bản rủi ro | 11     | `spec.md` §5-§6                         |
+| R4 · Kiểm thử                     | 15     | `spec.md` §7 + `eval/`                 |
+| R5 · Prototype chạy được        | 8      | `codebase/` + demo                        |
+| R6 · Validation với user           | 8      | `validation/`                             |
+| R7 · Quy trình & repo              | 3      | cấu trúc repo                             |
 
 Ba điều nên biết trước khi làm:
 
