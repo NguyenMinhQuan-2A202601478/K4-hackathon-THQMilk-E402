@@ -19,9 +19,9 @@ Tài liệu này tổng hợp toàn bộ bằng chứng khảo sát định lư�
    - *Đánh giá*: **40/43 người (93.0%)** học viên hàng ngày chịu áp lực tải thông báo cao đến trung bình trên Discord.
 
 2. **Bạn có gặp khó khăn khi theo dõi thông báo trên Discord không (Ex: miss thông báo)?**
-   - **Có (Gặp khó khăn/Miss thông báo)**: 28 người (**65.1%**)
+   - **Có (Gặp khó khăn/Miss thông báo)**: 31 người (**72.1%**)
    - **Không**: 15 người (**34.9%**)
-   - *Đánh giá*: **65.1% học viên** trực tiếp bị vướng pain-point bỏ lỡ thông báo bài tập hoặc mốc deadline do tin nhắn trôi quá nhanh.
+   - *Đánh giá*: **72.1% học viên (31/43 người)** trực tiếp bị vướng pain-point bỏ lỡ thông báo bài tập hoặc mốc deadline do tin nhắn trôi quá nhanh.
 
 3. **Bạn có muốn có một trợ lý ảo tính năng tóm tắt các thông báo quan trọng trong ngày không?**
    - **Có (Mong muốn sử dụng)**: 37 người (**86.0%**)
