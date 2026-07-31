@@ -28,8 +28,7 @@ def detect_language(text: str) -> str:
 
 class PreGuardrail:
     """
-    STAGE 1: PRE-GUARDRAIL (Input Safety, Universal Multi-Language Scope Validation & Clarification)
-    Includes Security & Sensitive Information Leak Prevention.
+    STAGE 1: PRE-GUARDRAIL (Input Safety, Strict Scope Partitioning & Out-of-Domain Firewall)
     """
     @staticmethod
     def generate_universal_refusal(user_prompt: str, refusal_reason: str) -> str:
@@ -42,9 +41,10 @@ class PreGuardrail:
                 f"Refusal/Context reason: {refusal_reason}\n\n"
                 f"STRICT MANDATE:\n"
                 f"- RESPOND 100% IN THE EXACT SAME LANGUAGE AS THE USER'S INPUT!\n"
-                f"- If user asked in English (e.g. 'what can you do'), YOU MUST REPLY 100% IN ENGLISH!\n"
+                f"- If user asked in English (e.g. 'what is oop'), YOU MUST REPLY 100% IN ENGLISH!\n"
                 f"- If user asked in Vietnamese, reply in Vietnamese.\n"
                 f"- Be warm, cheerful, and polite with an emoji (e.g. 🌸, 😅).\n"
+                f"- Explain that you are strictly an Announcement Agent and do NOT answer programming theory or general coding questions.\n"
                 f"- Keep it concise (2 sentences max)."
             )
             resp = provider.complete(
@@ -59,12 +59,12 @@ class PreGuardrail:
 
         if user_lang == "en":
             return (
-                "Hi there! 🌸 I am a Discord AI Assistant specialized in summarizing **Class Announcements, Deadlines, Assignments, and Zoom Links** for students. "
-                "Feel free to ask me about today's deadlines or Zoom meeting links! 😊"
+                "Hi there! 🌸 I am strictly a Discord Announcement Agent. "
+                "I only assist with **Class Announcements, Deadlines, Assignments, and Zoom Links**, not general programming theory or coding tutoring! 😊"
             )
         return (
-            "Dạ xin lỗi bạn nha 😅! Mình là Discord AI Agent chuyên tóm tắt **Thông báo học tập, Bài tập, Lịch họp Zoom và Quy định** cho học viên ạ. "
-            "Bạn có thể hỏi mình về lịch họp Zoom hay hạn nộp bài hôm nay nhé! 🌸"
+            "Dạ xin lỗi bạn nha 😅! Mình là Discord AI Agent chuyên tóm tắt **Thông báo học tập, Bài tập, Lịch họp Zoom và Quy định**, "
+            "chứ không phải trợ giảng lý thuyết lập trình hay giải bài tập giúp ạ. Bạn có thể hỏi mình về lịch họp Zoom hay hạn nộp bài hôm nay nhé! 🌸"
         )
 
     @classmethod
@@ -80,17 +80,39 @@ class PreGuardrail:
             refusal = cls.generate_universal_refusal(user_prompt, "User asked a math calculation. Explain you only summarize student class announcements.")
             return False, "math_calculation", refusal
 
-        # 2. Comprehensive Security Attacks / Prompt Injection / Sensitive Info Leak Prevention
+        # 2. Strict Scope Partitioning: Block General Programming Theory & Out-of-Domain Academic Concepts
+        theory_patterns = [
+            r"(là gì|thế nào là|giải thích|hướng dẫn|nguyên lý|định nghĩa|khái niệm|dùng để làm gì) (về |cho tôi về )?(oop|fastapi|python|sql|html|css|javascript|code|thuật toán|cấu trúc dữ liệu|lập trình|kế thừa|đóng gói|đa hình|trừu tượng|database|rest api|docker|git|pydantic|react)",
+            r"viết (code|script|hàm|chương trình|đoạn code)",
+            r"giải (bài tập|đề thi|câu hỏi|đáp án)",
+            r"what is (oop|fastapi|python|sql|programming|class|object|inheritance|polymorphism|docker|git)",
+            r"explain (oop|fastapi|python|sql|code|algorithm|inheritance)",
+            r"how to (code|program|write script|implement)",
+        ]
+        for pattern in theory_patterns:
+            if re.search(pattern, clean_prompt):
+                if user_lang == "en":
+                    refusal = (
+                        "Hi there! 🌸 I am strictly a Discord Announcement Assistant. "
+                        "I am not authorized to answer general programming theory, coding tutorials, or academic concepts (like OOP, FastAPI, or writing scripts). "
+                        "Feel free to ask me about class deadlines, Zoom meeting links, or submission rules! 😊"
+                    )
+                else:
+                    refusal = (
+                        "Dạ xin lỗi bạn nha 😅! Mình là Bot chuyên trách tra cứu **Thông báo học tập, Deadline, Lịch họp Zoom và Quy định**, "
+                        "chứ không phải trợ giảng lý thuyết lập trình (như OOP, FastAPI) hay công cụ viết code hộ ạ.\n\n"
+                        "Nếu bạn cần tra cứu hạn nộp bài tập OOP hay link Zoom học hôm nay, cứ hỏi mình nhé! 🌸"
+                    )
+                return False, "out_of_domain_theory", refusal
+
+        # 3. Comprehensive Security Attacks / Prompt Injection / Sensitive Info Leak Prevention
         security_patterns = [
-            # API Keys & Secrets Leak
             r"lộ (mật khẩu|api key|token|thông tin mật|private key|dữ liệu cá nhân|secret|tài khoản)",
             r"reveal (api key|password|secret|token|private key|credentials|env)",
             r"show (me )?(the )?(api key|token|env|password|secret)",
             r"cho xem (file .env|api key|token|mật khẩu|chuỗi bí mật)",
-            # System Prompt / System Instructions Leak
             r"(show|reveal|display|print|cho xem|hiển thị) (your )?(system prompt|system instruction|hướng dẫn hệ thống|prompt gốc)",
             r"what are your (instructions|rules|system prompt)",
-            # Prompt Injection Attacks
             r"ignore (all )?previous instructions",
             r"bỏ qua (tất cả )?hướng dẫn",
             r"system override",
@@ -103,7 +125,6 @@ class PreGuardrail:
             r"忽略(所有)?指令",
             r"olvida las instrucciones",
             r"vergiss die anweisungen",
-            # PII / Sensitive Personal Data Leak
             r"(lộ|tiết lộ|xem) (cccd|cmnd|số điện thoại|sđt|thẻ tín dụng|credit card|tài khoản ngân hàng)",
         ]
         for pattern in security_patterns:
@@ -122,7 +143,7 @@ class PreGuardrail:
                     )
                 return False, "security_attack", refusal
 
-        # 3. Mismatched Intent: Asking to summarize "questions/chatter" instead of "announcements"
+        # 4. Mismatched Intent: Asking to summarize "questions/chatter" instead of "announcements"
         question_summary_patterns = [
             r"tóm tắt (các )?câu hỏi",
             r"tóm tắt thắc mắc",
@@ -140,12 +161,12 @@ class PreGuardrail:
                 else:
                     refusal = (
                         "Dạ xin lỗi bạn nha 😅! Hệ thống của mình được thiết kế chuyên trách đọc và tóm tắt các **Thông báo học tập, Bài tập, Lịch họp Zoom và Quy định** từ BTC/Giáo viên, "
-                        "chức không tóm tắt các câu hỏi thảo luận của học viên ạ.\n\n"
+                        "chứ không tóm tắt các câu hỏi thảo luận của học viên ạ.\n\n"
                         "Nếu bạn cần tra cứu hạn nộp bài hay lịch học Zoom hôm nay, cứ hỏi mình nhé! 🌸"
                     )
                 return False, "mismatched_intent_questions", refusal
 
-        # 4. Weird / Bizarre / Ambiguous Queries -> Ask Clarifying Question Back!
+        # 5. Weird / Bizarre / Ambiguous Queries -> Ask Clarifying Question Back!
         weird_patterns = [
             r"mấy cái lạ",
             r"quần áo",
@@ -170,7 +191,7 @@ class PreGuardrail:
                     )
                 return False, "ambiguous_clarification", refusal
 
-        # 5. General Off-Topic / Capability Queries
+        # 6. General Off-Topic / Capability Queries
         capability_patterns = [
             r"đọc (được |cái )?đường link",
             r"bạn (có thể|có biết) làm (được )?gì",
@@ -189,7 +210,7 @@ class PreGuardrail:
                 refusal = cls.generate_universal_refusal(user_prompt, "User asked what the bot can do or asked off-topic questions. Explain your scope is summarizing student class announcements.")
                 return False, "off_topic", refusal
 
-        # 6. Universal Scope Check: Must have announcement intent
+        # 7. Universal Scope Check: Must have announcement intent
         announcement_keywords = [
             "thông báo", "hạn", "nộp", "bài", "lịch", "zoom", "deadline", "quy định",
             "slide", "meeting", "workshop", "link", "tóm tắt", "hôm nay", "tuần này",
