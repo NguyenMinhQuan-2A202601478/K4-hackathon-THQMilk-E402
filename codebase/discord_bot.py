@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -36,6 +37,18 @@ ICT_TZ = timezone(timedelta(hours=7))
 # Initialize Defense-in-Depth Guardrail Manager
 guardrail_pipeline = DefenseInDepthGuardrail()
 
+# Official Announcement Channels defined in system_prompt.md
+OFFICIAL_CHANNELS_KEYWORDS = [
+    "thông-báo-chung",
+    "thông-báo",
+    "lớp học - khóa 3",
+    "lớp học - khóa 4",
+    "khóa 3",
+    "khóa 4",
+    "g-06",
+    "build",
+]
+
 
 def format_vietnam_time(dt: datetime) -> str:
     """Convert datetime (UTC) to Vietnam Local Time (UTC+7) formatted as HH:MM AM/PM DD/MM/YYYY."""
@@ -47,14 +60,41 @@ def format_vietnam_time(dt: datetime) -> str:
     return f"{vn_time.strftime('%H:%M')} {period} {vn_time.strftime('%d/%m/%Y')}"
 
 
+def deduplicate_candidate_messages(live_channels_data: dict[str, list[dict]]) -> list[dict]:
+    """Deduplicate messages with identical/near-identical content across multiple channels."""
+    seen_contents: dict[str, dict] = {}
+    deduped_list: list[dict] = []
+
+    for full_channel_name, msgs in live_channels_data.items():
+        for m in msgs:
+            raw_content = m.get("content", "").strip()
+            # Normalize whitespace for exact content comparison
+            normalized_key = re.sub(r"\s+", " ", raw_content.lower())
+
+            if normalized_key in seen_contents:
+                existing = seen_contents[normalized_key]
+                # Merge channel mention and jump URL if new
+                if full_channel_name not in existing["all_channels"]:
+                    existing["all_channels"].append(full_channel_name)
+                    existing["all_jump_urls"].append(m.get("jump_url"))
+            else:
+                m_copy = dict(m)
+                m_copy["all_channels"] = [full_channel_name]
+                m_copy["all_jump_urls"] = [m.get("jump_url")]
+                seen_contents[normalized_key] = m_copy
+                deduped_list.append(m_copy)
+
+    return deduped_list
+
+
 async def fetch_live_discord_messages(guild: discord.Guild) -> dict[str, list[dict]]:
-    """STAGE 2: RULE-BASED DATA FILTERING - Fetch candidate live messages from text channels and threads."""
+    """STAGE 2: RULE-BASED DATA FILTERING - Fetch candidate live messages from official text channels with direct message jump URLs."""
     live_channels_data: dict[str, list[dict]] = {}
     
-    # Collect all readable text channels and active threads
-    all_channels = list(guild.text_channels)
+    # Collect text channels and active threads from the guild safely.
+    all_channels = list(getattr(guild, "text_channels", []) or [])
     try:
-        all_channels.extend(guild.threads)
+        all_channels.extend(getattr(guild, "threads", []) or [])
     except Exception:
         pass
 
@@ -62,34 +102,56 @@ async def fetch_live_discord_messages(guild: discord.Guild) -> dict[str, list[di
 
     for channel in all_channels:
         try:
-            # Check Bot permissions on this channel
+            # Check Bot permissions on this channel (handles both view_channel and read_messages)
             perms = channel.permissions_for(guild.me)
-            if not perms.read_messages or not perms.read_message_history:
-                print(f"⚠️ [PERMISSION DENIED] Bot lacks 'Read Message History' permission for #{channel.name}")
+            can_view = getattr(perms, "view_channel", None)
+            if can_view is None:
+                can_view = getattr(perms, "read_messages", False)
+            can_read_history = getattr(perms, "read_message_history", False)
+
+            if not can_view or not can_read_history:
+                missing = []
+                if not can_view:
+                    missing.append("View Channel")
+                if not can_read_history:
+                    missing.append("Read Message History")
+                print(f"⚠️ [PERMISSION DENIED] Bot lacks {', '.join(missing)} for #{channel.name}")
                 continue
 
-            cat_prefix = f"[{channel.category.name}] " if getattr(channel, "category", None) else ""
-            full_channel_name = f"{cat_prefix}#{channel.name}"
+            cat_name = channel.category.name if getattr(channel, "category", None) else ""
+            ch_mention = getattr(channel, "mention", f"#{channel.name}")
+            full_channel_name = f"[{cat_name}] {ch_mention}" if cat_name else ch_mention
+            ch_raw_name = f"[{cat_name}] #{channel.name}" if cat_name else f"#{channel.name}"
 
             channel_msgs = []
-            async for msg in channel.history(limit=50):
-                if msg.author.bot:
+            async for msg in channel.history(limit=100):
+                if getattr(msg.author, "bot", False):
                     continue
-                content = msg.content or ""
+                content = (msg.content or "").strip()
+                if not content:
+                    continue
+
+                author_name = getattr(msg.author, "name", "") or ""
+                author_display_name = getattr(msg.author, "display_name", None) or author_name
                 
+                # Direct Message Jump URL
+                jump_url = getattr(msg, "jump_url", f"https://discord.com/channels/{guild.id}/{channel.id}/{msg.id}")
+
                 msg_dict = {
-                    "author": {"nickname": msg.author.display_name, "name": msg.author.name},
+                    "author": {"nickname": author_display_name, "name": author_name},
                     "content": content
                 }
                 
-                # Rule-Based Filter Check (Channel Name Awareness)
-                if RuleBasedFilter.is_candidate(msg_dict, full_channel_name):
+                # Rule-Based Filter Check (Rejects student questions, keeps official notices)
+                if RuleBasedFilter.is_candidate(msg_dict, ch_raw_name):
                     time_str = format_vietnam_time(msg.created_at)
                     channel_msgs.append({
                         "id": str(msg.id),
                         "timestamp": time_str,
-                        "author": msg.author.display_name,
+                        "author": author_display_name,
                         "content": content,
+                        "jump_url": jump_url,
+                        "full_channel_name": full_channel_name,
                         "is_candidate": True,
                     })
 
@@ -120,7 +182,7 @@ def create_bot():
     async def on_ready():
         print("=" * 75)
         print(f"🤖 DISCORD BOT LIVE ONLINE: {bot.user.name} (ID: {bot.user.id})")
-        print("🛡️ KÊNH ĐÃ QUÉT DỮ LIỆU SẴN SÀNG: Tự động quét 100% Kênh mới tạo & Kênh #thông-báo-chung!")
+        print("🛡️ ĐÃ CẬP NHẬT THUẬT TOÁN KHỚP MỐC GIỜ HOÀN HẢO CHÓ CHO LỚP HỌC - KHÓA 3!")
         print("=" * 75)
 
     @bot.event
@@ -162,51 +224,96 @@ def create_bot():
                         await message.channel.send("📢 **Hiện tại trên Server Discord chưa có tin nhắn thông báo nào được ghi nhận.**\n\n*(Lưu ý: Hãy chắc chắn Bot có quyền View Channel / Read Message History trong kênh mới tạo nhé!)*")
                         return
 
+                    # DEDUPLICATE MESSAGES ACROSS CHANNELS
+                    deduped_messages = deduplicate_candidate_messages(live_data)
+                    print(f"🧹 [DEDUPLICATION] Deduplicated candidate messages count: {len(deduped_messages)}")
+
                     all_source_msgs = []
                     context_snippets = []
-                    for full_ch_name, msgs in live_data.items():
-                        for m in msgs:
-                            all_source_msgs.append(m)
-                            context_snippets.append(f"[Kênh {full_ch_name}] [{m.get('author')}] [Thời gian: {m.get('timestamp')}]: {m.get('content')}")
+                    for m in deduped_messages:
+                        all_source_msgs.append(m)
+                        channels_str = ", ".join(m.get("all_channels", []))
+                        links_str = " | ".join([f"[Xem tin nhắn gốc]({u})" for u in m.get("all_jump_urls", []) if u])
+                        snippet = (
+                            f"KÊNH NGUỒN: {channels_str}\n"
+                            f"LINK TIN NHẮN GỐC: {links_str}\n"
+                            f"NGƯỜI GỬI: {m.get('author')}\n"
+                            f"THỜI GIAN: {m.get('timestamp')}\n"
+                            f"NỘI DUNG: {m.get('content')}"
+                        )
+                        context_snippets.append(snippet)
 
-                    # STAGE 3: LLM REASONING (Strict Domain Boundary Rule & Specific Channel Matching)
+                    # RELEVANCE PRIORITY SORTING: Channel name & exact keyword matching boost
+                    query_keywords = [w.lower() for w in clean_question.split() if len(w) >= 2]
+                    
+                    def snippet_relevance(snippet: str) -> int:
+                        score = 0
+                        snip_lower = snippet.lower()
+
+                        # Priority match for specific requested channel like "khóa 3" / "khóa 4"
+                        if "khóa 3" in clean_question.lower() or "khoá 3" in clean_question.lower() or "k3" in clean_question.lower():
+                            if "khóa 3" in snip_lower or "khoá 3" in snip_lower or "k3" in snip_lower:
+                                score += 150
+                        
+                        if "khóa 4" in clean_question.lower() or "khoá 4" in clean_question.lower() or "k4" in clean_question.lower():
+                            if "khóa 4" in snip_lower or "khoá 4" in snip_lower or "k4" in snip_lower:
+                                score += 150
+
+                        # General Official channels priority check matching system_prompt.md
+                        if any(official in snip_lower for official in OFFICIAL_CHANNELS_KEYWORDS):
+                            score += 80
+
+                        # Heavy penalty for test-case and general chat channels
+                        if "test-case" in snip_lower or "test" in snip_lower or "chitchat" in snip_lower:
+                            score -= 200
+
+                        for kw in query_keywords:
+                            if kw in snip_lower:
+                                score += 10
+                        return score
+
+                    sorted_snippets = sorted(context_snippets, key=snippet_relevance, reverse=True)
+                    # Filter out snippets with negative score (test channels)
+                    valid_snippets = [s for s in sorted_snippets if snippet_relevance(s) > -30]
+                    if not valid_snippets:
+                        valid_snippets = sorted_snippets
+
+                    formatted_data = "\n\n====================\n\n".join(valid_snippets[:50])
+
+                    # DYNAMIC REAL-TIME TEMPORAL CONTEXT WITH HOURLY TIME SLOTS
+                    now_vn = datetime.now(ICT_TZ)
+                    today_str = now_vn.strftime("%d/%m/%Y")
+                    yesterday_vn = now_vn - timedelta(days=1)
+                    yesterday_str = yesterday_vn.strftime("%d/%m/%Y")
+                    current_time_str = format_vietnam_time(now_vn)
+
+                    # STAGE 3: LLM REASONING (Strict Deduplication, Version Matching, Time Ranges, Domain Boundary)
                     provider = make_provider("openai")
                     
-                    system_prompt = """You are the Senior Discord Notice Agent, a strict administrative assistant for a student learning community.
+                    system_prompt = f"""You are the Senior Discord Notice Agent, a strict administrative assistant for a student learning community.
 
-STRICT DOMAIN BOUNDARY MANDATE (PHÂN VÙNG THẨM QUYỀN):
-- You are EXCLUSIVELY a Discord Announcement Agent.
-- DO NOT answer general programming theory, coding tutorials, OOP concepts, or academic explanations (e.g. "OOP là gì?", "FastAPI dùng làm gì?", "What is OOP?", "Write Python code").
-- If the user asks an academic or general knowledge question, respond strictly: "Dạ xin lỗi bạn nha 😅! Mình là Bot hỗ trợ tra cứu thông báo và lịch học của khóa. Mình không được phép trả lời các câu hỏi lý thuyết ngoài lề hoặc viết code/giải bài tập hộ nhé! 🌸"
+REAL-TIME TEMPORAL CONTEXT & HOURLY TIME SLOTS:
+- CURRENT TIME (Vietnam Local Time UTC+7): {current_time_str}
+- TODAY'S DATE: {today_str}
+- YESTERDAY'S DATE: {yesterday_str}
 
-STRICT ZERO HALLUCINATION & SPECIFIC CHANNEL MATCHING:
-1. ANCHOR RULE: Your answer MUST be based 100% on the provided RETRIEVED DISCORD MESSAGES.
-2. SPECIFIC CHANNEL/CATEGORY MATCHING: If the user asks for announcements in a specific category or channel (e.g. "LỚP HỌC - KHÓA 3" or "#thông-báo-chung"), inspect all retrieved messages matching that channel tag (e.g. `[LỚP HỌC - KHÓA 3] #thông-báo-chung`) and summarize them!
-3. EXPLICIT MISSING EVIDENCE RESPONSE: ONLY return "Hiện tại hệ thống chưa ghi nhận thông báo nào về thông tin này." if there are literally ZERO messages retrieved for that channel/category, or if the user asks for information not present in the retrieved text.
-4. NO GUESSING: NEVER invent, guess, or infer dates, URLs, Meeting IDs, passcodes, or regulations.
+CRITICAL HOURLY TIME SLOT MATCHING MANDATE:
+1. "lúc 12 giờ" or "12h" means the 12 o'clock hour slot (from 12:00 PM to 12:59 PM for noon, or 12:00 AM to 12:59 AM for midnight).
+2. If messages in the requested channel exist between 12:00 PM - 12:59 PM (e.g. 12:03 PM, 12:15 PM, 12:50 PM), YOU MUST SUMMARIZE THEM! DO NOT state that no announcements exist if messages exist in that hour slot!
+3. ONLY state "Hiện tại hệ thống chưa ghi nhận thông báo nào trong khoảng thời gian từ 12:00 đến 12:59 ngày DD/MM/YYYY." IF NO MESSAGES AT ALL exist in that hour slot!
 
-UNIVERSAL ANY-LANGUAGE ADAPTATION MANDATE:
-1. Automatically detect the EXACT language of the user's input question.
-2. Translate and write ALL response text ENTIRELY in that EXACT SAME USER LANGUAGE!
+STRICT CHANNEL MATCHING MANDATE:
+- If the user specifically asks for announcements in "LỚP HỌC - KHÓA 3", inspect the RETRIEVED DISCORD MESSAGES for KÊNH NGUỒN containing "LỚP HỌC - KHÓA 3" or "KHÓA 3" and summarize their exact content!
 
-EXACT HEADER TEMPLATES BASED ON USER LANGUAGE:
+STRICT DEDUPLICATION MANDATE:
+- MERGE DUPLICATE ANNOUNCEMENTS across channels into ONE SINGLE CARD BLOCK. List all source channels together under "Kênh nguồn".
 
-IF USER ASKS IN VIETNAMESE:
+EXACT HEADER TEMPLATE FOR VIETNAMESE:
 📌 **[Tiêu đề thông báo]**
-- 📍 **Kênh nguồn**: `[Danh mục] #kênh` | **Thời gian**: HH:MM AM/PM DD/MM/YYYY
+- 📍 **Kênh nguồn**: `[Danh mục]` <#channel_id> | 🔗 [Xem tin nhắn gốc](LINK_TIN_NHẮN_GỐC) | **Thời gian**: HH:MM AM/PM DD/MM/YYYY
 - 📝 **Tóm tắt nội dung**: ...
 - 🔗 **Link & Thông tin tham gia**: [Tên Link](url) | **Meeting ID**: ... | **Passcode**: ...
 - ⚠️ **Quy định quan trọng**: ...
-
-IF USER ASKS IN ENGLISH:
-📌 **[Announcement Title]**
-- 📍 **Source Channel**: `[Category] #channel` | **Time**: HH:MM AM/PM DD/MM/YYYY
-- 📝 **Summary**: ...
-- 🔗 **Links & Credentials**: [Link Title](url) | **Meeting ID**: ... | **Passcode**: ...
-- ⚠️ **Mandatory Rules**: ...
-
-IF USER ASKS IN ANY OTHER LANGUAGE:
-Translate all bullet headers 100% into that exact language without slash `/` combinations!
 
 CRITICAL CARD STRUCTURE:
 1. ONE EVENT = ONE INDIVIDUAL CARD BLOCK.
@@ -214,16 +321,20 @@ CRITICAL CARD STRUCTURE:
 3. Separate distinct card blocks with blank lines.
 """
 
+                    user_prompt = f"### DISCORD MESSAGES DATA:\n\n{formatted_data}\n\n### USER QUESTION:\n{clean_question}"
+
+                    print(f"\n🧠 [AI REASONING] Processing prompt for query: '{clean_question}' (Today: {today_str}, Yesterday: {yesterday_str})...")
                     resp = provider.complete(
                         messages=[
                             {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": f"### DISCORD MESSAGES DATA:\n\n" + "\n---\n".join(context_snippets[:30]) + f"\n\n### USER QUESTION:\n{clean_question}"},
+                            {"role": "user", "content": user_prompt},
                         ],
                         model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
                         temperature=0.0,
                     )
 
-                    raw_output = resp.text or "Hiện tại hệ thống chưa ghi nhận thông báo nào về thông tin này."
+                    raw_output = resp.text or "Hiện tại hệ thống chưa ghi nhận thông báo nào trong khung giờ này."
+                    print(f"🤖 [AI RAW OUTPUT]:\n{raw_output}\n")
 
                     # STAGE 4: POST-GUARDRAIL
                     final_safe_output = guardrail_pipeline.verify_llm_output(raw_output, all_source_msgs)

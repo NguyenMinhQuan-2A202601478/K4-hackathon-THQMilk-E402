@@ -41,10 +41,10 @@ class PreGuardrail:
                 f"Refusal/Context reason: {refusal_reason}\n\n"
                 f"STRICT MANDATE:\n"
                 f"- RESPOND 100% IN THE EXACT SAME LANGUAGE AS THE USER'S INPUT!\n"
-                f"- If user asked in English (e.g. 'what is oop'), YOU MUST REPLY 100% IN ENGLISH!\n"
+                f"- If user asked in English, reply in English.\n"
                 f"- If user asked in Vietnamese, reply in Vietnamese.\n"
                 f"- Be warm, cheerful, and polite with an emoji (e.g. 🌸, 😅).\n"
-                f"- Explain that you are strictly an Announcement Agent and do NOT answer programming theory or general coding questions.\n"
+                f"- Explain that you are strictly an Announcement Agent and ask a clarifying question.\n"
                 f"- Keep it concise (2 sentences max)."
             )
             resp = provider.complete(
@@ -59,12 +59,12 @@ class PreGuardrail:
 
         if user_lang == "en":
             return (
-                "Hi there! 🌸 I am strictly a Discord Announcement Agent. "
-                "I only assist with **Class Announcements, Deadlines, Assignments, and Zoom Links**, not general programming theory or coding tutoring! 😊"
+                "Hi there! 🌸 Your question is a bit ambiguous. "
+                "Are you looking for a **Zoom meeting link**, **GitHub repository link**, or **VLearn slide link**? Please clarify so I can help! 😊"
             )
         return (
-            "Dạ xin lỗi bạn nha 😅! Mình là Discord AI Agent chuyên tóm tắt **Thông báo học tập, Bài tập, Lịch họp Zoom và Quy định**, "
-            "chứ không phải trợ giảng lý thuyết lập trình hay giải bài tập giúp ạ. Bạn có thể hỏi mình về lịch họp Zoom hay hạn nộp bài hôm nay nhé! 🌸"
+            "Dạ câu hỏi của bạn nghe hơi ngắn và chưa rõ ý lắm ạ 😅! "
+            "Bạn đang muốn tra cứu thông báo hay nội dung gì vậy ạ? Bạn nói rõ thêm một chút để mình hỗ trợ nhé! 🌸"
         )
 
     @classmethod
@@ -74,6 +74,73 @@ class PreGuardrail:
 
         clean_prompt = user_prompt.strip().lower()
         user_lang = detect_language(user_prompt)
+
+        # 0A. AMBIGUOUS VAGUE LINK PATTERNS -> Tailored Link Clarification Response!
+        vague_link_patterns = [
+            r"^link (ở đâu|đâu|gì|nào)$",
+            r"^(cho xin |xem |gửi |xin )?link$",
+            r"^ở đâu$",
+            r"^ở đâu vậy$",
+            r"^nộp (bài )?ở đâu$",
+        ]
+        for pattern in vague_link_patterns:
+            if re.search(pattern, clean_prompt):
+                if user_lang == "en":
+                    refusal = (
+                        "Hi there! 🌸 Your question about links is a bit ambiguous. "
+                        "Are you looking for a **Zoom meeting link**, **GitHub repository link**, or **VLearn slide link**? Please clarify so I can get you the right link! 😊"
+                    )
+                else:
+                    refusal = (
+                        "Dạ bạn cho mình hỏi bạn đang muốn xin **link Zoom học**, **link repo GitHub nộp bài** hay **link slide VLearn** vậy ạ? "
+                        "Bạn nói rõ tên kênh hoặc chủ đề để mình tìm đúng link cho bạn nhé! 🌸"
+                    )
+                return False, "vague_link_clarification", refusal
+
+        # 0B. AMBIGUOUS VAGUE SUMMARY PATTERNS -> Tailored Summary Clarification Response!
+        vague_summary_patterns = [
+            r"tóm tắt cái kia",
+            r"tóm tắt cái đó",
+            r"tóm tắt cái này",
+            r"tóm tắt giúp cái kia",
+        ]
+        for pattern in vague_summary_patterns:
+            if re.search(pattern, clean_prompt):
+                if user_lang == "en":
+                    refusal = (
+                        "Hi there! 🌸 Could you please clarify which channel or announcement you want me to summarize? "
+                        "Are you looking for **Cohort 3**, **Cohort 4**, or **Build Workshop** announcements? 😊"
+                    )
+                else:
+                    refusal = (
+                        "Dạ bạn cho mình hỏi 'cái kia' là bạn đang muốn tóm tắt **Thông báo Khóa 3**, **Thông báo Khóa 4** hay **Workshop Build Phase 1** vậy ạ? "
+                        "Bạn nói rõ tên kênh để mình tóm tắt chính xác cho bạn nhé! 🌸"
+                    )
+                return False, "vague_summary_clarification", refusal
+
+        # 0C. GENERAL AMBIGUOUS / VAGUE PATTERNS
+        vague_general_patterns = [
+            r"mấy cái lạ",
+            r"quần áo",
+            r"xyz",
+            r"abc",
+            r"bạn hiểu không",
+            r"huh",
+        ]
+        for pattern in vague_general_patterns:
+            if re.search(pattern, clean_prompt):
+                if user_lang == "en":
+                    refusal = (
+                        "Your question seems a bit ambiguous! 😅 "
+                        "Are you looking for **Zoom meeting links**, **assignment deadlines**, or **lecture slides**? Please clarify so I can help you! 🌸"
+                    )
+                else:
+                    refusal = (
+                        "Dạ câu hỏi của bạn nghe hơi lạ và chưa rõ ý lắm ạ 😅! "
+                        "Ý bạn là bạn đang muốn tra cứu **Lịch họp Zoom**, **Hạn nộp bài tập** hay **Slide bài giảng** hôm nay vậy ạ? "
+                        "Bạn nói rõ hơn chút để mình hỗ trợ bạn chính xác nhất nhé! 🌸"
+                    )
+                return False, "ambiguous_general_clarification", refusal
 
         # 1. Math / Calculations check (e.g. 1+1, 2*3, 10/2)
         if re.match(r"^[\d\s\+\-\*\/\%\(\)\.\=]+$", clean_prompt):
@@ -166,32 +233,7 @@ class PreGuardrail:
                     )
                 return False, "mismatched_intent_questions", refusal
 
-        # 5. Weird / Bizarre / Ambiguous Queries -> Ask Clarifying Question Back!
-        weird_patterns = [
-            r"mấy cái lạ",
-            r"quần áo",
-            r"xyz",
-            r"abc",
-            r"tóm tắt cái kia",
-            r"bạn hiểu không",
-            r"huh",
-        ]
-        for pattern in weird_patterns:
-            if re.search(pattern, clean_prompt):
-                if user_lang == "en":
-                    refusal = (
-                        "Your question seems a bit ambiguous! 😅 "
-                        "Are you looking for **Zoom meeting links**, **assignment deadlines**, or **lecture slides**? Please clarify so I can help you! 🌸"
-                    )
-                else:
-                    refusal = (
-                        "Dạ câu hỏi của bạn nghe hơi lạ và chưa rõ ý lắm ạ 😅! "
-                        "Ý bạn là bạn đang muốn tra cứu **Lịch họp Zoom**, **Hạn nộp bài tập** hay **Slide bài giảng** hôm nay vậy ạ? "
-                        "Bạn nói rõ hơn chút để mình hỗ trợ bạn chính xác nhất nhé! 🌸"
-                    )
-                return False, "ambiguous_clarification", refusal
-
-        # 6. General Off-Topic / Capability Queries
+        # 5. General Off-Topic / Capability Queries
         capability_patterns = [
             r"đọc (được |cái )?đường link",
             r"bạn (có thể|có biết) làm (được )?gì",
@@ -210,13 +252,13 @@ class PreGuardrail:
                 refusal = cls.generate_universal_refusal(user_prompt, "User asked what the bot can do or asked off-topic questions. Explain your scope is summarizing student class announcements.")
                 return False, "off_topic", refusal
 
-        # 7. Universal Scope Check: Must have announcement intent
+        # 6. Universal Scope Check: Must have announcement intent
         announcement_keywords = [
             "thông báo", "hạn", "nộp", "bài", "lịch", "zoom", "deadline", "quy định",
             "slide", "meeting", "workshop", "link", "tóm tắt", "hôm nay", "tuần này",
             "bài tập", "họp", "mentor", "code", "repo", "lab", "g01", "t001", "đề tài",
             "mô tả", "nội dung", "mấy giờ", "khi nào", "phòng", "kênh", "channel", "mới",
-            "tìm", "cho", "lớp", "khóa", "k3", "k4", "xem", "tra cứu", "tin nhắn",
+            "tìm", "cho", "lớp", "khóa", "k3", "k4", "xem", "tra cứu", "tin nhắn", "trưa", "sáng", "chiều", "tối",
             "summary", "announcement", "assignment", "schedule", "resource", "project",
             "notice", "tarea", "entrega", "résumé", "zusammenfassung", "通知", "課題"
         ]
@@ -249,6 +291,19 @@ class RuleBasedFilter:
 
     OFFICIAL_ROLES = ["lab coach", "coach", "btc", "teacher", "giảng viên", "trợ giảng", "admin"]
 
+    USER_QUERY_PATTERNS = [
+        r"<@!?\d+>",
+        r"tóm tắt (các |các thông báo|thông báo)",
+        r"có (thông báo|lịch|zoom) nào",
+        r"cho (xin|mình xin|tôi xin)",
+        r"hôm nay có (mấy|thông báo|gì)",
+        r"là (bao nhiêu|gì)",
+        r"khi nào",
+        r"mấy giờ",
+        r"passcode phòng zoom",
+        r"hạn chót bài",
+    ]
+
     @classmethod
     def is_noise(cls, text: str) -> bool:
         if not text or len(text.strip()) < 2:
@@ -262,23 +317,28 @@ class RuleBasedFilter:
         if cls.is_noise(content):
             return False
 
-        # Any non-noise message in an announcement/class channel IS ALWAYS A CANDIDATE!
-        ch_lower = channel_name.lower()
-        if any(kw in ch_lower for kw in ["thông-báo", "thông báo", "announcement", "notice", "thong-bao", "thong bao", "lớp học", "khóa 3", "khóa 4", "k3", "k4", "general", "chung"]):
-            return True
-
+        content_lower = content.lower()
         author = msg.get("author", {})
         nickname = (author.get("nickname") or "").lower() if isinstance(author, dict) else str(author).lower()
         roles = [r.get("name", "").lower() for r in author.get("roles", [])] if isinstance(author, dict) else []
-        content_lower = content.lower()
 
         is_official_author = (
             any(role in cls.OFFICIAL_ROLES for role in roles)
             or any(kw in nickname for kw in ["coach", "btc", "teacher", "giảng viên", "trợ giảng", "admin"])
         )
 
+        # REJECT STUDENT QUESTIONS/QUERY MESSAGES SENT IN CHAT CHANNELS
+        is_user_query = any(re.search(pat, content_lower) for pat in cls.USER_QUERY_PATTERNS)
+        if is_user_query and not is_official_author:
+            return False
+
+        # Any non-noise message in an announcement/class channel IS A CANDIDATE!
+        ch_lower = channel_name.lower()
+        if any(kw in ch_lower for kw in ["thông-báo", "thông báo", "announcement", "notice", "thong-bao", "thong bao"]):
+            return True
+
         has_keyword = any(kw in content_lower for kw in cls.ANNOUNCEMENT_KEYWORDS)
-        return is_official_author or has_keyword or len(content) >= 5
+        return is_official_author or has_keyword
 
 
 class PostGuardrail:

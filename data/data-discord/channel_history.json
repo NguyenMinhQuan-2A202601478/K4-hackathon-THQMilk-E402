@@ -1,0 +1,154 @@
+{
+  "database_name": "discord_master_announcements_db",
+  "version": "2.0.0",
+  "last_updated": "2026-07-31T14:00:00.000+07:00",
+  "channels": {
+    "#thông-báo-chung": [
+      {
+        "id": "msg_001",
+        "timestamp_iso": "2026-07-31T08:30:00.000+07:00",
+        "timestamp_formatted": "08:30 AM 31/07/2026",
+        "time_slot": "Sáng (08:00 - 12:00)",
+        "author": "BTC - Trợ giảng",
+        "roles": ["BTC", "Admin"],
+        "content": "[LỚP HỌC - KHÓA 4] Cập nhật slide VLearn đã được up lên repo: https://github.com/VinUni-AI20k/Batch03-K4-AI-Product-Hackathon. Các team hãy clone về để sử dụng."
+      },
+      {
+        "id": "msg_002",
+        "timestamp_iso": "2026-07-31T14:15:00.000+07:00",
+        "timestamp_formatted": "02:15 PM 31/07/2026",
+        "time_slot": "Chiều (12:00 - 18:00)",
+        "author": "BTC",
+        "roles": ["BTC"],
+        "content": "Chiều nay vẫn có labcoach, VLearn, chatbot hỗ trợ trực tiếp từng phòng lý thuyết. Nếu cần hỗ trợ thêm, các team nhắn vào kênh hỗ trợ."
+      },
+      {
+        "id": "msg_003",
+        "timestamp_iso": "2026-07-31T20:00:00.000+07:00",
+        "timestamp_formatted": "08:00 PM 31/07/2026",
+        "time_slot": "Tối (18:00 - 23:59)",
+        "author": "BTC Admin",
+        "roles": ["BTC", "Admin"],
+        "content": "Nhắc lại: Cổng nộp bài Checkpoint 4 đã mở. Deadline chốt 23:59 tối nay, nộp link GitHub repo chính thức."
+      }
+    ],
+    "#thông-báo": [
+      {
+        "id": "msg_010",
+        "timestamp_iso": "2026-07-30T09:00:00.000+07:00",
+        "timestamp_formatted": "09:00 AM 30/07/2026",
+        "time_slot": "Sáng (08:00 - 12:00)",
+        "author": "Coach Minh",
+        "roles": ["Lab Coach"],
+        "content": "Link Zoom Office Hours tư vấn 1-1 hôm qua: https://zoom.us/j/111111 Meeting ID: 111 1111 111 Passcode: 123456"
+      },
+      {
+        "id": "msg_011",
+        "timestamp_iso": "2026-07-30T18:00:00.000+07:00",
+        "timestamp_formatted": "06:00 PM 30/07/2026",
+        "time_slot": "Tối (18:00 - 23:59)",
+        "author": "Coach Minh",
+        "roles": ["Lab Coach"],
+        "content": "Đính chính: Cập nhật link Zoom mới cho Office Hours: https://zoom.us/j/92862242782 Meeting ID: 928 6224 2782 Passcode: 232439"
+      }
+    ],
+    "[BUILD] #thông-báo": [
+      {
+        "id": "msg_020",
+        "timestamp_iso": "2026-07-31T09:30:00.000+07:00",
+        "timestamp_formatted": "09:30 AM 31/07/2026",
+        "time_slot": "Sáng (08:00 - 12:00)",
+        "author": "Admin Kỹ thuật",
+        "roles": ["Admin"],
+        "content": "📌 CÚ PHÁP ĐẶT TÊN CHUẨN KHI VÀO ROOM BUILD: Mã nhóm — Mã đội — Họ và tên (Ví dụ: G01 — T001 — Nguyễn Văn An). Yêu cầu đổi tên đúng cú pháp để được điểm danh."
+      },
+      {
+        "id": "msg_021",
+        "timestamp_iso": "2026-07-31T20:00:00.000+07:00",
+        "timestamp_formatted": "08:00 PM 31/07/2026",
+        "time_slot": "Tối (18:00 - 23:59)",
+        "author": "Admin Kỹ thuật",
+        "roles": ["Admin"],
+        "content": "Kick-off Workshop Build Phase 1 diễn ra lúc 20:00 PM tối nay trên Zoom. Link Zoom: https://zoom.us/j/92862242782 Meeting ID: 928 6224 2782 Passcode: 232439"
+      }
+    ],
+    "[LỚP HỌC - KHÓA 3] #thông-báo-chung": [
+      {
+        "id": "msg_030",
+        "timestamp_iso": "2026-07-31T08:15:00.000+07:00",
+        "timestamp_formatted": "08:15 AM 31/07/2026",
+        "time_slot": "Sáng (08:00 - 12:00)",
+        "author": "BTC Khóa 3",
+        "roles": ["BTC"],
+        "content": "Cập nhật slide VLearn Khóa 3 đã được up lên repo: https://github.com/VinUni-AI20k/Batch03-K3-AI-Product-Hackathon"
+      },
+      {
+        "id": "msg_031",
+        "timestamp_iso": "2026-07-31T14:30:00.000+07:00",
+        "timestamp_formatted": "02:30 PM 31/07/2026",
+        "time_slot": "Chiều (12:00 - 18:00)",
+        "author": "BTC Khóa 3",
+        "roles": ["BTC"],
+        "content": "Lịch nộp báo cáo Spec Khóa 3 được chốt lúc 17:00 chiều nay. Các đội nhanh chóng cập nhật file vào repo."
+      },
+      {
+        "id": "msg_032",
+        "timestamp_iso": "2026-07-31T19:30:00.000+07:00",
+        "timestamp_formatted": "07:30 PM 31/07/2026",
+        "time_slot": "Tối (18:00 - 23:59)",
+        "author": "BTC Khóa 3",
+        "roles": ["BTC"],
+        "content": "Nhắc nhở Khóa 3: Buổi review demo dự án diễn ra lúc 20:00 PM tối nay."
+      }
+    ],
+    "[LỚP HỌC - KHÓA 4] #thông-báo-chung": [
+      {
+        "id": "msg_040",
+        "timestamp_iso": "2026-07-31T00:38:00.000+07:00",
+        "timestamp_formatted": "00:38 AM 31/07/2026",
+        "time_slot": "Đêm/Sáng (00:00 - 08:00)",
+        "author": "BTC Khóa 4",
+        "roles": ["BTC"],
+        "content": "Slide VLearn đã được up lên repo: https://github.com/VinUni-AI20k/Batch03-K4-AI-Product-Hackathon. Chiều nay vẫn có labcoach hỗ trợ từng phòng."
+      },
+      {
+        "id": "msg_041",
+        "timestamp_iso": "2026-07-31T10:00:00.000+07:00",
+        "timestamp_formatted": "10:00 AM 31/07/2026",
+        "time_slot": "Sáng (08:00 - 12:00)",
+        "author": "BTC Khóa 4",
+        "roles": ["BTC"],
+        "content": "Hạn nộp Spec Khóa 4 ban đầu là 17:00 PM chiều nay."
+      },
+      {
+        "id": "msg_042",
+        "timestamp_iso": "2026-07-31T14:00:00.000+07:00",
+        "timestamp_formatted": "02:00 PM 31/07/2026",
+        "time_slot": "Chiều (12:00 - 18:00)",
+        "author": "BTC Khóa 4",
+        "roles": ["BTC"],
+        "content": "Đính chính: Gia hạn nộp spec Khóa 4 đến 23:59 PM đêm nay."
+      }
+    ],
+    "[G-06] #thông-báo-chung": [
+      {
+        "id": "msg_050",
+        "timestamp_iso": "2026-07-31T09:00:00.000+07:00",
+        "timestamp_formatted": "09:00 AM 31/07/2026",
+        "time_slot": "Sáng (08:00 - 12:00)",
+        "author": "Mentor Nhóm G-06",
+        "roles": ["Mentor"],
+        "content": "Thông báo nhóm G-06: Sáng nay mentor hỗ trợ duyệt kiến trúc từ 09:00 - 11:30 AM."
+      },
+      {
+        "id": "msg_051",
+        "timestamp_iso": "2026-07-31T21:00:00.000+07:00",
+        "timestamp_formatted": "09:00 PM 31/07/2026",
+        "time_slot": "Tối (18:00 - 23:59)",
+        "author": "Mentor Nhóm G-06",
+        "roles": ["Mentor"],
+        "content": "Lịch họp riêng private của nhóm G-06 diễn ra lúc 21:00 PM tối nay ngày 31/07/2026."
+      }
+    ]
+  }
+}
