@@ -1,66 +1,49 @@
-# User Validation Feedback Log - Discord Announcement Summarizer
+# User Validation & Survey Feedback Log - Discord Announcement Summarizer Agent
 
-This document records direct user testing feedback from 5 learners/users outside the core development team, validating the usability, trustworthiness, and effectiveness of the Discord Daily Announcement Summarizer.
-
----
-
-## Feedback Entry 1
-- **Tester Name**: Nguyễn Văn Minh (Student - Cohort 4)
-- **Role**: Learner / Student
-- **Tested Task**: Reviewing daily announcements after missing 2 days of Discord chatter.
-- **Positive Feedback**: "The daily digest grouped deadlines and assignments clearly by category. The evidence quotes with timestamps helped me verify the exact post quickly without scrolling."
-- **Negative Feedback**: "I wished there was an explicit indicator showing if a deadline was extended compared to yesterday."
-- **Suggested Improvement**: Add a delta indicator or highlight for extended deadlines.
-- **Action Taken**: Added evidence snippet comparison for conflicting/extended deadlines.
+Tài liệu này tổng hợp toàn bộ bằng chứng khảo sát định lượng (**n = 43 người ngoài nhóm**) từ file dữ liệu thực tế [Khảo sát trải nghiệm sử dụng Discord (Câu trả lời).xlsx](file:///c:/Users/huyqu/Desktop/ai-thuc-chien/K4-hackathon-THQMilk-E402/validation/Kh%E1%BA%A3o%20s%C3%A1t%20tr%E1%BA%A3i%20nghi%E1%BB%87m%20s%E1%BB%AD%20d%E1%BB%A5ng%20Discord%20(C%C3%A2u%20tr%E1%BA%A3%20l%E1%BB%9Di).xlsx).
 
 ---
 
-## Feedback Entry 2
-- **Tester Name**: Lê Thị Thanh Hương (Lab Coach / TA)
-- **Role**: TA / Coach
-- **Tested Task**: Verifying that official announcements from `#📣-thông-báo` are not missed or mixed up with student questions.
-- **Positive Feedback**: "Great job filtering out casual student messages. Only official deadlines and schedule updates from TA/BTC posts were summarized."
-- **Negative Feedback**: "Some student posts in group channels (#thông-báo-nhóm) were missing timestamps in the short summary header."
-- **Suggested Improvement**: Ensure every single bullet item includes full ISO timestamp and channel tag.
-- **Action Taken**: Formatted all output templates to mandate Timestamp, Channel, Confidence, and Evidence quotes.
+## KẾT QUẢ KHẢO SÁT ĐỊNH LƯỢNG (SURVEY DATASET N = 43)
+
+- **Nguồn dữ liệu**: File gốc [Khảo sát trải nghiệm sử dụng Discord (Câu trả lời).xlsx](file:///c:/Users/huyqu/Desktop/ai-thuc-chien/K4-hackathon-THQMilk-E402/validation/Kh%E1%BA%A3o%20s%C3%A1t%20tr%E1%BA%A3i%20nghi%E1%BB%87m%20s%E1%BB%AD%20d%E1%BB%A5ng%20Discord%20(C%C3%A2u%20tr%E1%BA%A3%20l%E1%BB%9Di).xlsx)
+- **Đối tượng khảo sát**: **43 học viên ngoài nhóm**
+- **Chuẩn nghiệm thu A (Guide §1.3)**: Đạt (≥20 người ngoài nhóm, 86.0% xác nhận nhu cầu, log đầy đủ trong repo).
+
+### 📊 1. Thống kê chi tiết theo 3 câu hỏi cốt lõi
+
+1. **Hằng ngày bạn có nhận nhiều thông báo từ Discord không?**
+   - **Nhiều**: 17 người (**39.5%**)
+   - **Trung bình**: 23 người (**53.5%**)
+   - **Ít**: 3 người (**7.0%**)
+   - *Đánh giá*: **40/43 người (93.0%)** học viên hàng ngày chịu áp lực tải thông báo cao đến trung bình trên Discord.
+
+2. **Bạn có gặp khó khăn khi theo dõi thông báo trên Discord không (Ex: miss thông báo)?**
+   - **Có (Gặp khó khăn/Miss thông báo)**: 28 người (**65.1%**)
+   - **Không**: 15 người (**34.9%**)
+   - *Đánh giá*: **65.1% học viên** trực tiếp bị vướng pain-point bỏ lỡ thông báo bài tập hoặc mốc deadline do tin nhắn trôi quá nhanh.
+
+3. **Bạn có muốn có một trợ lý ảo tính năng tóm tắt các thông báo quan trọng trong ngày không?**
+   - **Có (Mong muốn sử dụng)**: 37 người (**86.0%**)
+   - **Không**: 6 người (**14.0%**)
+   - *Đánh giá*: **86.0% học viên ngoài nhóm** khẳng định sẵn sàng sử dụng sản phẩm Trợ lý ảo tóm tắt thông báo.
 
 ---
 
-## Feedback Entry 3
-- **Tester Name**: Trần Hoàng Nam (Learner - Team G-23)
-- **Role**: Student
-- **Tested Task**: Searching for Zoom links and slides for Workshop 1.
-- **Positive Feedback**: "The Resources section caught the Zoom link and vlearn.dev slide links immediately. Saved me at least 15 minutes of searching."
-- **Negative Feedback**: "Zoom meeting passwords should be highlighted in bold next to the link."
-- **Suggested Improvement**: Automatically format credentials/passwords alongside links.
-- **Action Taken**: Enhanced LLM extraction prompt to capture meeting passcodes in Resources.
+### 💬 2. Trích dẫn nguyên văn mong muốn tính cách & hành vi trợ lý (Direct Quotes từ 43 Phản hồi)
 
----
-
-## Feedback Entry 4
-- **Tester Name**: Phạm Quốc Bảo (Learner - Cohort 3)
-- **Role**: Peer Learner (Zone 2)
-- **Tested Task**: Testing adversarial spam and fake deadline injection messages.
-- **Positive Feedback**: "Impressive anti-hallucination handling! The bot ignored the fake prompt injection asking it to set all deadlines to 2099."
-- **Negative Feedback**: "When there are no items in a category, it says 'Not enough evidence.' - a bit formal, but acceptable."
-- **Suggested Improvement**: Maintain clean 'Not enough evidence' fallback to preserve trust.
-- **Action Taken**: Kept strict 'Not enough evidence' fallback policy across all 5 sections.
-
----
-
-## Feedback Entry 5
-- **Tester Name**: Đỗ Anh Tuấn (Product Lead - Peer Team)
-- **Role**: Student Product Engineer
-- **Tested Task**: Inspecting the end-to-end execution speed and Markdown report layout.
-- **Positive Feedback**: "Pipeline execution under 15 seconds is very fast. Output markdown is easy to read directly in Discord or GitHub."
-- **Negative Feedback**: "Would be nice to export directly to Google Calendar."
-- **Suggested Improvement**: Provide direct Google Calendar sync action links in the HTML simulator / UI.
-- **Action Taken**: Integrated interactive Google Calendar sync buttons into the UI mock and summary cards.
+1. *"Nghiêm túc, nói ngắn gọn, không liên thuyên không cần thiết"* (Khảo sát phản hồi #7)
+2. *"Mình muốn nó nhắc nhở thông báo một cách thân thiện"* (Khảo sát phản hồi #4)
+3. *"vui vẻ nhưng không lan man"* (Khảo sát phản hồi #3)
+4. *"thẳng thắng không lan man"* (Khảo sát phản hồi #5)
+5. *"Đi thẳng vào vấn đề"* (Khảo sát phản hồi #17)
+6. *"chuyên nghiệp, ngắn gọn"* (Khảo sát phản hồi #22)
+7. *"luôn giải đáp các thắc mắc và có tính năng tắt thông báo"* (Khảo sát phản hồi #23)
 
 ---
 
 ## Validation Summary
 
-- **Total Testers**: 5 users
-- **Overall Willingness to Use**: 100% (5/5 users confirmed value)
-- **Key Trust Factor**: Evidence quotes + channel sources + zero hallucination guarantee.
+- **Khảo sát định lượng (Survey)**: **43 học viên ngoài nhóm** (86.0% mong muốn sử dụng).
+- **File bằng chứng nguồn**: [Khảo sát trải nghiệm sử dụng Discord (Câu trả lời).xlsx](file:///c:/Users/huyqu/Desktop/ai-thuc-chien/K4-hackathon-THQMilk-E402/validation/Kh%E1%BA%A3o%20s%C3%A1t%20tr%E1%BA%A3i%20nghi%E1%BB%87m%20s%E1%BB%AD%20d%E1%BB%A5ng%20Discord%20(C%C3%A2u%20tr%E1%BA%A3%20l%E1%BB%9Di).xlsx)
+- **Yếu tố tin tưởng cốt lõi**: Trích dẫn bằng chứng (Evidence quotes) + Thẻ kênh nguồn + Không hallucination + Phản hồi ngắn gọn, không lan man.
