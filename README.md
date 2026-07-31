@@ -50,6 +50,20 @@ repo/
 └── reflection/        ← mỗi người 1 file
 ```
 
+### Bảng phân công nhiệm vụ nhóm 3 Thành viên (Giai đoạn tiếp theo - R1 & R2 đã xong ✅)
+
+> 🟢 **Trạng thái:** Phần **R1** (`spec.md` §1-§2) và **R2** (`spec.md` §4) đã hoàn thành xuất sắc (**30/75 điểm**).
+
+| Thành viên | Vai trò | Phụ trách File / Phần | Nhiệm vụ chi tiết phần còn lại | Tiêu chí Rubric còn lại |
+|---|---|---|---|---|
+| **Thành viên 1** | **Spec Risks & Slide Lead** | `spec.md` (§5-§6)<br>`demo-slides.pdf`<br>`README.md` | • Viết §5 & §6 trong `spec.md` (Chỗ khó kỹ thuật AI & Kịch bản rủi ro/fallback).<br>• Làm slide pitch 6 trang `demo-slides.pdf`.<br>• Rà soát tổng thể repo & theo dõi nộp bài CP4 & CP5. | **R3 (11đ)**: Chỗ khó & Rủi ro<br>**R7 (3đ)**: Quy trình & Repo<br>**Demo Pitch** |
+| **Thành viên 2** | **AI & Prototype Lead** | `codebase/` | • Hoàn thiện Prototype trong `codebase/` (Discord Bot / Mock Flow HTML + ≥1 lời gọi AI thật).<br>• Tích hợp luồng xử lý dữ liệu tin nhắn từ 4 kênh gán nhãn.<br>• Nắm chắc code để giải thích tại vòng phỏng vấn CP5 (*Vibe-coding rule*). | **R5 (8đ)**: Prototype chạy được |
+| **Thành viên 3** | **Eval & User Validation Lead** | `eval/`<br>`validation/`<br>`spec.md` (§7) | • Xây dựng Golden Set & bảng kết quả chạy đo lường trong `eval/`.<br>• Thu thập log feedback từ vòng user test trong `validation/`.<br>• Viết §7 trong `spec.md` (Khung kiểm thử & Đo lường). | **R4 (15đ)**: Kiểm thử & Golden set<br>**R6 (8đ)**: Validation với User |
+
+*(Lưu ý: Tất cả 3 thành viên đều phải tự viết 1 file thu hoạch cá nhân trong thư mục `reflection/`)*
+
+
+
 ## Chấm điểm
 
 Tổng **100 điểm = 25 điểm nộp checkpoint + 75 điểm chấm bài nộp**. Chi tiết từng ý điểm: `04-rubric.md`.

@@ -1,0 +1,22 @@
+{
+  "guild": {
+    "id": "1526532830627102781",
+    "name": "AI20K Build Phase — Cohort 3 & 4",
+    "iconUrl": "https://cdn.discordapp.com/icons/1526532830627102781/f605bf41f4d19baaa8a2039654056db5.png?size=512"
+  },
+  "channel": {
+    "id": "1531305653589774469",
+    "type": "GuildTextChat",
+    "categoryId": "1531305647445115001",
+    "category": "G-23",
+    "name": "thông-báo-nhóm",
+    "topic": null
+  },
+  "dateRange": {
+    "after": "2026-07-23T00:00:00+07:00",
+    "before": "2026-07-30T00:00:00+07:00"
+  },
+  "exportedAt": "2026-07-30T20:36:53.2807466+07:00",
+  "messages": [],
+  "messageCount": 0
+}

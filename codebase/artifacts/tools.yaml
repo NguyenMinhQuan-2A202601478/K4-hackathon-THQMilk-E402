@@ -1,0 +1,37 @@
+tools:
+  - name: clarify
+    description: "Gửi một câu hỏi cho người dùng để làm rõ thông tin."
+    parameters:
+      type: object
+      properties:
+        question: {type: string, default: "", description: "Câu hỏi làm rõ"}
+      required: [question]
+
+  - name: load_discord_messages
+    description: "Đọc, lọc nhiễu và gom nhóm tin nhắn từ các file Discord JSON."
+    parameters:
+      type: object
+      properties:
+        data_dir_path: {type: string, default: "", description: "Đường dẫn thư mục chứa dữ liệu Discord JSON"}
+
+  - name: generate_discord_digest
+    description: "Phân tích tầm quan trọng và sinh bản tin tóm tắt Daily Important Updates bằng OpenAI."
+    parameters:
+      type: object
+      properties:
+        provider_name: {type: string, default: "openai", description: "Tên LLM Provider"}
+        model: {type: string, default: "gpt-4o-mini", description: "Mô hình LLM"}
+
+  - name: format
+    description: "Trình bày dữ liệu thông báo thành bản tin Markdown định dạng chuẩn."
+    parameters:
+      type: object
+      properties:
+        content: {type: string, default: "", description: "Văn bản định dạng"}
+
+  - name: lookup
+    description: "Tra cứu thông tin bổ sung."
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Từ khóa tra cứu"}
