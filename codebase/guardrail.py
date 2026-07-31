@@ -215,7 +215,8 @@ class PreGuardrail:
             "thông báo", "hạn", "nộp", "bài", "lịch", "zoom", "deadline", "quy định",
             "slide", "meeting", "workshop", "link", "tóm tắt", "hôm nay", "tuần này",
             "bài tập", "họp", "mentor", "code", "repo", "lab", "g01", "t001", "đề tài",
-            "mô tả", "nội dung", "mấy giờ", "khi nào", "phòng",
+            "mô tả", "nội dung", "mấy giờ", "khi nào", "phòng", "kênh", "channel", "mới",
+            "tìm", "cho", "lớp", "khóa", "k3", "k4", "xem", "tra cứu", "tin nhắn",
             "summary", "announcement", "assignment", "schedule", "resource", "project",
             "notice", "tarea", "entrega", "résumé", "zusammenfassung", "通知", "課題"
         ]
@@ -250,28 +251,34 @@ class RuleBasedFilter:
 
     @classmethod
     def is_noise(cls, text: str) -> bool:
-        if not text or len(text.strip()) < 5:
+        if not text or len(text.strip()) < 2:
             return True
         cleaned = text.strip().lower()
         return any(re.search(pat, cleaned) for pat in cls.NOISE_PATTERNS)
 
     @classmethod
-    def is_candidate(cls, msg: dict[str, Any]) -> bool:
-        if cls.is_noise(msg.get("content", "")):
+    def is_candidate(cls, msg: dict[str, Any], channel_name: str = "") -> bool:
+        content = (msg.get("content") or "").strip()
+        if cls.is_noise(content):
             return False
+
+        # Any non-noise message in an announcement/class channel IS ALWAYS A CANDIDATE!
+        ch_lower = channel_name.lower()
+        if any(kw in ch_lower for kw in ["thông-báo", "thông báo", "announcement", "notice", "thong-bao", "thong bao", "lớp học", "khóa 3", "khóa 4", "k3", "k4", "general", "chung"]):
+            return True
 
         author = msg.get("author", {})
         nickname = (author.get("nickname") or "").lower() if isinstance(author, dict) else str(author).lower()
         roles = [r.get("name", "").lower() for r in author.get("roles", [])] if isinstance(author, dict) else []
-        content = (msg.get("content") or "").lower()
+        content_lower = content.lower()
 
         is_official_author = (
             any(role in cls.OFFICIAL_ROLES for role in roles)
             or any(kw in nickname for kw in ["coach", "btc", "teacher", "giảng viên", "trợ giảng", "admin"])
         )
 
-        has_keyword = any(kw in content for kw in cls.ANNOUNCEMENT_KEYWORDS)
-        return is_official_author or has_keyword
+        has_keyword = any(kw in content_lower for kw in cls.ANNOUNCEMENT_KEYWORDS)
+        return is_official_author or has_keyword or len(content) >= 5
 
 
 class PostGuardrail:
@@ -289,7 +296,7 @@ class PostGuardrail:
                 quote_match = re.search(r'"([^"]+)"', line) or re.search(r'“([^”]+)”', line)
                 if quote_match:
                     quote = quote_match.group(1).lower().strip()
-                    grounded = any(quote[:30] in (m.get("content", "") or "").lower() for m in source_messages)
+                    grounded = any(quote[:20] in (m.get("content", "") or "").lower() for m in source_messages)
                     if not grounded and len(source_messages) > 0:
                         has_hallucination = True
                         verified_lines.append("  - **Evidence**: \"Not enough evidence from source messages.\" [Post-Guard Verified]")
